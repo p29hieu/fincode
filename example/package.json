@@ -1,0 +1,21 @@
+{
+  "name": "fincode-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node-dev index.ts"
+  },
+  "author": "p29hieu",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "fincode": "../"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.1",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.4"
+  }
+}

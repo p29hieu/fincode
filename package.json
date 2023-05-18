@@ -1,0 +1,29 @@
+{
+  "name": "fincode",
+  "version": "0.0.2",
+  "description": "Type scripts for Fincode",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rimraf ./dist && tsc",
+    "prepublish": "npm build",
+    "publish": "npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/p29hieu/fincode"
+  },
+  "keywords": [
+    "fincode"
+  ],
+  "author": "p29hieu",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.2.0",
+    "prettier": "2.8.8",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "axios": "^1.4.0"
+  }
+}
