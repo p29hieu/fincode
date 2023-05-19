@@ -6,7 +6,8 @@
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "prepublish": "yarn build",
-    "publish": "npm publish"
+    "publish": "npm publish",
+    "test": "echo 'test done'"
   },
   "repository": {
     "type": "git",
