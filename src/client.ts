@@ -67,7 +67,7 @@ export class FincodeClientService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/getCustomersCustomer_idCards
    */
-  async getCustomersCustomerIdCards(customerId: string): Promise<{ list: FincodeNs.CardInformation[] }> {
+  async getCustomersCustomerIdCards(customerId: string): Promise<{ list: FincodeNs.CardInfo[] }> {
     const endpoint = "/customers/{customer_id}/cards".replace(
       "{customer_id}",
       customerId

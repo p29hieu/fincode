@@ -78,7 +78,7 @@ export class FincodeService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E9%A1%A7%E5%AE%A2/operation/getCustomersId
    */
-  async getCustomersId(customerId: string): Promise<FincodeNs.CustomerInformationResponse> {
+  async getCustomersId(customerId: string): Promise<FincodeNs.CustomerInfo> {
     const res = await this.service.get('/customers/{id}'.replace('{id}', customerId));
     return res.data;
   }
@@ -87,7 +87,7 @@ export class FincodeService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E9%A1%A7%E5%AE%A2/operation/putCustomersId
    */
-  async putCustomersId(customerId: string, data: Partial<FincodeNs.PostCustomerRequest>): Promise<FincodeNs.CustomerInformationResponse> {
+  async putCustomersId(customerId: string, data: Partial<FincodeNs.PostCustomerRequest>): Promise<FincodeNs.CustomerInfo> {
     const oldData = await this.getCustomersId(customerId);
     const res = await this.service.put('/customers/{id}'.replace('{id}', customerId), {
       ...oldData,
@@ -113,7 +113,7 @@ export class FincodeService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/getCustomersCustomer_idCards
    */
-  async getCustomersCustomerIdCards(customerId: string): Promise<FincodeNs.CardInformation[]> {
+  async getCustomersCustomerIdCards(customerId: string): Promise<FincodeNs.CardInfo[]> {
     if (!this._config.publicKey) {
       throw new Error("publicKey is required");
     }
@@ -160,7 +160,7 @@ export class FincodeService {
   /**
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/operation/putPaymentsId
    */
-  async putPaymentsId(orderId: string, data: FincodeNs.PurchaseData) {
+  async putPaymentsId(orderId: string, data: FincodeNs.PurchaseData): Promise<FincodeNs.OrderDetail> {
     const endpoint = "/payments/{id}".replace("{id}", orderId);
     const res = await this.service.put(endpoint, {
       pay_type: "CARD",

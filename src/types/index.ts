@@ -15,20 +15,6 @@ export namespace FincodeNs {
   };
 
   // https://docs.fincode.jp/api#tag/%E9%A1%A7%E5%AE%A2/operation/postCustomers
-  export type CustomerInfo = {
-    customer_id: string;
-    id: string;
-    default_flag: string;
-    card_no: string;
-    expire: string;
-    holder_name: string;
-    card_no_hash: string;
-    created: string;
-    updated: string;
-    type: string;
-    brand: string;
-  };
-
   export type PostCustomerRequest = {
     id?: string | null,
     name: string,
@@ -48,27 +34,14 @@ export namespace FincodeNs {
     created: string,
     updated: string
   }
+  export type CustomerInfo = CustomerInformationResponse;
 
   // https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/postCustomersCustomer_idCards
   export type RegisterCardRequest = {
     default_flag: string; // '0' or '1',
     token: string;
   }
-  export type RegisterCardResponse = {
-    customer_id: string,
-    id: string,
-    default_flag: string,
-    card_no: string,
-    expire: string,
-    holder_name: string,
-    card_no_hash: string,
-    created: string,
-    updated: string,
-    type: string,
-    brand: string
-  }
-
-  export type CardInformation = RegisterCardResponse;
+  export type RegisterCardResponse = CardInfo;
 
   export type PurchaseData = {
     access_id: string;
