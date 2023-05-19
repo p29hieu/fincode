@@ -1,12 +1,15 @@
 {
   "name": "fincode",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Type scripts for Fincode",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "rimraf ./dist && tsc",
-    "prepublish": "yarn build",
-    "publish": "npm publish",
+    "prepare": "yarn build",
     "test": "echo 'test done'"
   },
   "repository": {
