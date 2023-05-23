@@ -4,6 +4,7 @@ config();
 import { FincodeService, FincodeClientService } from "../src";
 
 const createCustomer = async () => {
+  console.log('createCustomer');
   const customerCreated = await FincodeService.i.postCustomers({
     email: "p29hieu@gmail.com",
     name: "p29hieu",
@@ -11,8 +12,8 @@ const createCustomer = async () => {
   console.log(customerCreated);
   /**
 {
-  id: 'c_5iZZH9W5RjO5Pt4Y5zBHwA',
-  name: 'p28hieu',
+  id: 'c_vv7Tk0P2Tau5B5jQuRsaCQ',
+  name: 'p29hieu',
   email: 'p29hieu@gmail.com',
   phone_cc: null,
   phone_no: null,
@@ -24,21 +25,24 @@ const createCustomer = async () => {
   addr_post_code: null,
   addr_state: null,
   card_registration: '0',
-  created: '2023/05/19 00:58:26.006',
-  updated: '2023/05/19 00:58:26.006'
+  created: '2023/05/22 10:07:58.747',
+  updated: '2023/05/22 10:07:58.747'
 }
    */
 }
 
 const getCustomer = async () => {
+  console.log('getCustomer');
   const customer = await FincodeService.i.getCustomersId('c_5iZZH9W5RjO5Pt4Y5zBHwA')
   console.log(customer);
 }
 
 const createCard = async () => {
-  const card = await FincodeService.i.postCustomersCustomerIdCards('c_5iZZH9W5RjO5Pt4Y5zBHwA', {
+  console.log('createCard');
+
+  const card = await FincodeService.i.postCustomersCustomerIdCards('c_poJq9ZToSN2rnvrz_Sm8LQ', {
     default_flag: "1",
-    token: "34313532666435386236623866353035313763363834643664643238343265663061376161613236376537646338393536346235346261623363623561653732"
+    token: "34303634643431666661633536333364613466643637643062636261393635636534666263306666313736353136633138303063346532643834376162396163"
   })
   console.log(card);
   /**
@@ -58,7 +62,9 @@ const createCard = async () => {
 }
 
 const getCustomerCards = async () => {
-  const cards = await FincodeClientService.i.getCustomersCustomerIdCards('c_5iZZH9W5RjO5Pt4Y5zBHwA')
+  console.log('getCustomerCards');
+
+  const cards = await FincodeClientService.i.getCustomersCustomerIdCards('c_poJq9ZToSN2rnvrz_Sm8LQ')
   console.log(cards);
   /**
 {
@@ -83,7 +89,7 @@ const getCustomerCards = async () => {
 
 const createOrder = async () => {
   const order = await FincodeService.i.createOrder({
-    price: 1000
+    price: 5000
   });
   console.log(order);
   /**
@@ -95,15 +101,19 @@ const createOrder = async () => {
 }
 
 const purchaseOrder = async () => {
+  console.log('purchaseOrder');
   const res = await FincodeService.i.putPaymentsId('o_j5Y2sbz-SuuLpdCfF4WyDg', {
     access_id: 'a_fqd2tpI4TMGjBentnP30cg',
-    card_id: 'cs_F_-y8HV-QG-skfugoExmpw'
+    customer_id: 'c_5iZZH9W5RjO5Pt4Y5zBHwA',
+    card_id: 'cs_F_-y8HV-QG-skfugoExmpw',
+    method: '1'
   })
   console.log(res);
 }
 
 const getPaymentsId = async () => {
-  const res = await FincodeService.i.getPaymentsId('o_j5Y2sbz-SuuLpdCfF4WyDg')
+  console.log('getPaymentsId');
+  const res = await FincodeService.i.getPaymentsId('o_fZHdCcP_QhKF0SyZk_cVOA')
   console.log(res);
 }
 
@@ -120,7 +130,7 @@ const getPaymentsId = async () => {
     // await createCustomer();
     // await getCustomer();
     // await createCard();
-    await getCustomerCards();
+    // await getCustomerCards();
     // await createOrder();
     // await purchaseOrder();
     // await getPaymentsId();

@@ -46,6 +46,8 @@ export namespace FincodeNs {
   export type PurchaseData = {
     access_id: string;
     card_id: string;
+    customer_id: string,
+    method: "1" | "2" | "5"
   }
 
   export type OrderDetail = {

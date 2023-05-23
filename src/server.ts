@@ -163,7 +163,7 @@ export class FincodeService {
   async putPaymentsId(orderId: string, data: FincodeNs.PurchaseData): Promise<FincodeNs.OrderDetail> {
     const endpoint = "/payments/{id}".replace("{id}", orderId);
     const res = await this.service.put(endpoint, {
-      pay_type: "CARD",
+      pay_type: "Card",
       ...data
     });
     return res.data;
