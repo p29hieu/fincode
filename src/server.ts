@@ -100,7 +100,7 @@ export class FincodeService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/postCustomersCustomer_idCards
    */
-  async postCustomersCustomerIdCards(customerId: string, data: FincodeNs.RegisterCardRequest): Promise<FincodeNs.RegisterCardResponse> {
+  async registerCard(customerId: string, data: FincodeNs.RegisterCardRequest): Promise<FincodeNs.RegisterCardResponse> {
     const endpoint = "/customers/{customer_id}/cards".replace(
       "{customer_id}",
       customerId
@@ -144,14 +144,12 @@ export class FincodeService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/operation/postPayments
    */
-  async createOrder({ price, client_field_1, client_field_2, client_field_3 }: { price: number, client_field_1?: string, client_field_2?: string, client_field_3?: string }): Promise<{ access_id: string; id: string }> {
+  async createOrder(data: FincodeNs.SettlementRegistration): Promise<{ access_id: string; id: string }> {
     const res = await this.service.post("/payments", {
-      pay_type: "Card",
-      job_code: "CAPTURE",
-      amount: `${Math.ceil(price)}`,
-      client_field_1,
-      client_field_2,
-      client_field_3
+      ...data,
+      ...(data.amount ? { amount: `${Math.ceil(data.amount)}` } : {}),
+      ...(data.tds2_type ? { tds2_type: data.tds2_type.toString() } : {}),
+      ...(data.tds_type ? { tds_type: data.tds_type.toString() } : {}),
     });
     const { access_id, id } = res.data;
     return { access_id, id };
@@ -160,24 +158,39 @@ export class FincodeService {
   /**
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/operation/putPaymentsId
    */
-  async putPaymentsId(orderId: string, data: FincodeNs.PurchaseData): Promise<FincodeNs.OrderDetail> {
+  async paymentExecution(orderId: string, data: FincodeNs.PaymentExecution): Promise<FincodeNs.OrderDetail> {
     const endpoint = "/payments/{id}".replace("{id}", orderId);
     const res = await this.service.put(endpoint, {
-      pay_type: "Card",
-      ...data
+      ...data,
+      ...(data.method ? { method: data.method.toString() } : {}),
+      ...(data.pay_times ? { pay_times: data.pay_times.toString() } : {})
     });
     return res.data;
   }
 
   /**
+   * Performs sales confirmation processing for payment. Available for transactions with settlement
+    カード決済status of AUTHORIZEDor for transactions with settlement status of .CANCELED
+    PayPayAUTHORIZED
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/operation/putPaymentsIdCapture
    */
-  async putPaymentsIdCapture(orderId: string, access_id: string) {
+  async putPaymentsIdCapture(orderId: string, data: FincodeNs.ConfirmSales): Promise<FincodeNs.OrderDetail> {
     const endpoint = "/payments/{id}/capture".replace("{id}", orderId);
-    await this.service.put(endpoint, {
-      pay_type: "Card",
-      access_id
+    return await this.service.put(endpoint, {
+      ...data,
+      ...(data.method ? { method: data.method.toString() } : {})
     });
+  }
+  /**
+   * Analyze 3D Secure results and use that information to make payments.
+   *
+   * カード決済available for trades of
+   *
+   * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/operation/putPaymentsIdSecure
+   */
+  async paymentAfterAuthentication(orderId: string, data: FincodeNs.PaymentAfterAuthentication): Promise<FincodeNs.OrderDetail> {
+    const endpoint = "/payments/{id}/secure".replace("{id}", orderId);
+    return await this.service.put(endpoint, data);
   }
 
   /**
@@ -189,4 +202,16 @@ export class FincodeService {
     const res = await this.service.get(`${endpoint}?${query}`)
     return res.data;
   }
+
+  /**
+   * Perform 3DS2.0 authentication.
+    カード決済available for trades of
+   *
+   * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/paths/~1secure2~1%7Baccess_id%7D/put
+   */
+    async run3DS2Authentication(access_id: string, data: FincodeNs.Run3DS2Authentication): Promise<FincodeNs.Result3DS2Authentication> {
+      const endpoint = "/secure2/{access_id}".replace("{access_id}", access_id);
+      const res = await this.service.put(`${endpoint}`, data)
+      return res.data;
+    }
 }

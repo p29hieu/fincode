@@ -75,4 +75,29 @@ export class FincodeClientService {
     const res = await this.service.get(endpoint)
     return res.data;
   }
+
+  /**
+   * Perform 3DS2.0 authentication.
+    カード決済available for trades of
+   *
+   * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/paths/~1secure2~1%7Baccess_id%7D/put
+   */
+  async run3DS2Authentication(access_id: string, data: FincodeNs.Run3DS2Authentication): Promise<FincodeNs.Result3DS2Authentication> {
+    const endpoint = "/secure2/{access_id}".replace("{access_id}", access_id);
+    const res = await this.service.put(`${endpoint}`, data)
+    return res.data;
+  }
+
+
+  /**
+   * Acquire 3DS2.0 authentication execution result.
+    カード決済available for trades of
+   *
+   * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/paths/~1secure2~1%7Baccess_id%7D/get
+   */
+  async get3DS2Result(access_id: string): Promise<FincodeNs.Result3DS2> {
+    const endpoint = "/secure2/{access_id}".replace("{access_id}", access_id);
+    const res = await this.service.get(`${endpoint}`)
+    return res.data;
+  }
 }
