@@ -82,11 +82,11 @@ export class FincodeClientService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/paths/~1secure2~1%7Baccess_id%7D/put
    */
-  async run3DS2Authentication(access_id: string, data: FincodeNs.Run3DS2Authentication): Promise<FincodeNs.Result3DS2Authentication> {
-    const endpoint = "/secure2/{access_id}".replace("{access_id}", access_id);
-    const res = await this.service.put(`${endpoint}`, data)
-    return res.data;
-  }
+  // async run3DS2Authentication(access_id: string, data: FincodeNs.Run3DS2Authentication): Promise<FincodeNs.Result3DS2Authentication> {
+  //   const endpoint = "/secure2/{access_id}".replace("{access_id}", access_id);
+  //   const res = await this.service.put(`${endpoint}`, data)
+  //   return res.data;
+  // }
 
 
   /**
@@ -95,7 +95,7 @@ export class FincodeClientService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/paths/~1secure2~1%7Baccess_id%7D/get
    */
-  async get3DS2Result(access_id: string): Promise<FincodeNs.Result3DS2> {
+  async acquire3DS2Result(access_id: string): Promise<FincodeNs.Result3DS2> {
     const endpoint = "/secure2/{access_id}".replace("{access_id}", access_id);
     const res = await this.service.get(`${endpoint}`)
     return res.data;

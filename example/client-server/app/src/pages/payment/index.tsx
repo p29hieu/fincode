@@ -1,6 +1,6 @@
 "use client";
 import { FincodeClientService, FincodeNs, FincodeService } from "fincode";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 type PurchaseDataResponse = {
   access_id: string;
@@ -55,6 +55,10 @@ const PaymentPage = () => {
       setCards(cardList.list);
     }
   }, [customerId]);
+
+  useEffect(() => {
+    fetchCardList();
+  }, [fetchCardList]);
 
   return (
     <div>
@@ -128,6 +132,7 @@ const PaymentPage = () => {
                   <th>Brand</th>
                   <th>CardNumber</th>
                   <th>Expirer</th>
+                  <th>Card ID</th>
                   <th>Default</th>
                   <th>Actions</th>
                 </tr>
@@ -144,6 +149,7 @@ const PaymentPage = () => {
                       <td>{card.brand}</td>
                       <td>{card.card_no}</td>
                       <td>{card.expire}</td>
+                      <td>{card.id}</td>
                       <td>{card.default_flag}</td>
                       <td>
                         <button

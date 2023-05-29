@@ -128,15 +128,9 @@ const getPaymentsId = async (orderId: string) => {
   return res;
 }
 
-const run3DS2AuthenticationByClient = async (access_id: string, param: string) => {
-  console.log("run3DS2AuthenticationByClient");
-  const res = await FincodeClientService.i.run3DS2Authentication(access_id, { param })
-  console.log(res);
-  return res;
-}
 const run3DS2AuthenticationByServer = async (access_id: string, param: string) => {
   console.log("run3DS2AuthenticationByServer");
-  const res = await FincodeService.i.run3DS2Authentication(access_id, { param })
+  const res = await FincodeService.i.perform3DS2Authentication(access_id, { param })
   console.log(res);
   return res;
 }
@@ -150,7 +144,7 @@ const confirmSales = async (orderId: string, data: FincodeNs.ConfirmSales) => {
 
 const get3DS2Result = async (access_id: string) => {
   console.log("get3DS2Result");
-  const res = await FincodeClientService.i.get3DS2Result(access_id)
+  const res = await FincodeClientService.i.acquire3DS2Result(access_id)
   console.log(res);
   return res;
 }

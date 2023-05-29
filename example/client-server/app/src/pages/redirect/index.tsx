@@ -1,26 +1,32 @@
-"use client"
+"use client";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 const ValidatePaymentPage = () => {
-  const router = useRouter()
-  const [redirectUrl, setRedirectUrl] = useState<string>()
+  const router = useRouter();
+  const [redirectUrl, setRedirectUrl] = useState<string>();
 
   useEffect(() => {
     const { url } = router.query;
     if (url) {
-      setRedirectUrl(`${url}`)
+      setRedirectUrl(`${url}`);
       // router.replace(`${url}`)
-      window.open(`${url}`, '_blank')
+      // setTimeout(() => {
+      //   window.open(`${url}`, "_blank");
+      // }, 300);
     }
-  }, [router])
+  }, [router]);
 
-  return <div>
-    Redirecting...
+  return (
     <div>
-      <a href={redirectUrl} target="_blank">{redirectUrl}</a>
+      Redirecting...
+      <div>
+        <a href={redirectUrl} target="_blank">
+          {redirectUrl}
+        </a>
+      </div>
     </div>
-  </div>
-}
+  );
+};
 
 export default ValidatePaymentPage;

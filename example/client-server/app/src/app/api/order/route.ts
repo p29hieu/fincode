@@ -15,6 +15,8 @@ export async function POST(request: Request, other: { params: any }) {
 
   try {
     const order = await FincodeService.i.createOrder({ amount, job_code: "AUTH", pay_type: "Card", tds2_type: "2", tds_type: "2" })
+    console.log("=== order created", order);
+
     return NextResponse.json(order);
   } catch (error: any) {
     throw error?.response?.data ?? error;
