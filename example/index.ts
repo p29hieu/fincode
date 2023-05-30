@@ -167,8 +167,8 @@ const paymentAfterAuthentication = async (orderId: string, data: FincodeNs.Payme
 
   const customer_id = 'c_poJq9ZToSN2rnvrz_Sm8LQ';
   const card_id = 'cs_iADgG895QAq3XNcPIVfQ0g';
-  const access_id = 'a_hsB1o4YOS5-RglcSIpcAKA';
-  const orderId = 'o_jDgDQTsqRT6NhvGC7JTknQ';
+  const access_id = 'a_wIbuF0tMT5eX3VQXWle0nA';
+  const orderId = 'o_SAUxyv9SSKKuaRqIvqoJjQ';
 
   try {
     // await createCustomer();

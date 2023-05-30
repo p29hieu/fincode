@@ -176,10 +176,11 @@ export class FincodeService {
    */
   async putPaymentsIdCapture(orderId: string, data: FincodeNs.ConfirmSales): Promise<FincodeNs.OrderDetail> {
     const endpoint = "/payments/{id}/capture".replace("{id}", orderId);
-    return await this.service.put(endpoint, {
+    const res =  await this.service.put(endpoint, {
       ...data,
       ...(data.method ? { method: data.method.toString() } : {})
     });
+    return res?.data;
   }
   /**
    * Analyze 3D Secure results and use that information to make payments.
@@ -190,7 +191,8 @@ export class FincodeService {
    */
   async paymentAfterAuthentication(orderId: string, data: FincodeNs.PaymentAfterAuthentication): Promise<FincodeNs.OrderDetail> {
     const endpoint = "/payments/{id}/secure".replace("{id}", orderId);
-    return await this.service.put(endpoint, data);
+    const res = await this.service.put(endpoint, data);
+    return res?.data;
   }
 
   /**
