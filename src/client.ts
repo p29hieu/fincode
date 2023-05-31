@@ -65,6 +65,15 @@ export class FincodeClientService {
 
   /**
    *
+   * ref: https://docs.fincode.jp/api#tag/%E9%A1%A7%E5%AE%A2/operation/getCustomersId
+   */
+  async getCustomersId(customerId: string): Promise<FincodeNs.CustomerInfo> {
+    const res = await this.service.get('/customers/{id}'.replace('{id}', customerId));
+    return res.data;
+  }
+
+  /**
+   *
    * ref: https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/getCustomersCustomer_idCards
    */
   async getCustomersCustomerIdCards(customerId: string): Promise<{ list: FincodeNs.CardInfo[] }> {

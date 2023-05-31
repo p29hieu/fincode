@@ -76,6 +76,15 @@ export class FincodeService {
 
   /**
    *
+   * ref: https://docs.fincode.jp/api#tag/%E9%A1%A7%E5%AE%A2/operation/getCustomers
+   */
+  async getCustomers(): Promise<FincodeNs.CustomersResponse> {
+    const res = await this.service.get('/customers');
+    return res.data;
+  }
+
+  /**
+   *
    * ref: https://docs.fincode.jp/api#tag/%E9%A1%A7%E5%AE%A2/operation/getCustomersId
    */
   async getCustomersId(customerId: string): Promise<FincodeNs.CustomerInfo> {
@@ -93,6 +102,16 @@ export class FincodeService {
       ...oldData,
       ...data,
     });
+    return res.data;
+  }
+
+  /**
+   *
+   * ref: https://docs.fincode.jp/api#tag/%E9%A1%A7%E5%AE%A2/operation/deleteCustomersId
+   */
+  async deleteCustomersId(customerId: string): Promise<FincodeNs.CustomerInfo> {
+    const endpoint = "/customers/{id}".replace("{id}", customerId);
+    const res = await this.service.delete(endpoint);
     return res.data;
   }
 
@@ -176,7 +195,7 @@ export class FincodeService {
    */
   async putPaymentsIdCapture(orderId: string, data: FincodeNs.ConfirmSales): Promise<FincodeNs.OrderDetail> {
     const endpoint = "/payments/{id}/capture".replace("{id}", orderId);
-    const res =  await this.service.put(endpoint, {
+    const res = await this.service.put(endpoint, {
       ...data,
       ...(data.method ? { method: data.method.toString() } : {})
     });
@@ -211,9 +230,9 @@ export class FincodeService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/paths/~1secure2~1%7Baccess_id%7D/put
    */
-    async perform3DS2Authentication(access_id: string, data: FincodeNs.Run3DS2Authentication): Promise<FincodeNs.Result3DS2Authentication> {
-      const endpoint = "/secure2/{access_id}".replace("{access_id}", access_id);
-      const res = await this.service.put(`${endpoint}`, data)
-      return res.data;
-    }
+  async perform3DS2Authentication(access_id: string, data: FincodeNs.Run3DS2Authentication): Promise<FincodeNs.Result3DS2Authentication> {
+    const endpoint = "/secure2/{access_id}".replace("{access_id}", access_id);
+    const res = await this.service.put(`${endpoint}`, data)
+    return res.data;
+  }
 }

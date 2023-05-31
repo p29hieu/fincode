@@ -537,4 +537,53 @@ export namespace FincodeNs {
      */
     param: string
   }
+
+  export type CustomersResponse = {
+    /**
+     * integer
+     *
+     * Total number of search results
+     */
+    total_count: number;
+    /**
+     * integer
+     *
+     * last page
+     */
+    last_page: number;
+
+    /**
+     * integer
+     *
+     * current page
+     */
+    current_page: number
+
+    /**
+     * integer
+     *
+     * Maximum number of items per page
+     */
+    limit: number;
+
+    /**
+     * string
+     *
+     * Link to next page
+     */
+    link_next: string;
+
+    /**
+     * string
+     *
+     * Link to previous page
+     */
+    link_previous: string;
+    /**
+     * Array of objects
+     *
+     * Customer data list
+     */
+    list: CustomerInfo[]
+  }
 }

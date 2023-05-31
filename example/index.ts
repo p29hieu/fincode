@@ -33,7 +33,21 @@ const createCustomer = async () => {
 
 const getCustomer = async (customer_id: string) => {
   console.log('getCustomer');
-  const customer = await FincodeService.i.getCustomersId(customer_id)
+  const customer = await FincodeClientService.i.getCustomersId(customer_id)
+  console.log(customer);
+  return customer;
+}
+
+const updateCustomer = async (customer_id: string) => {
+  console.log('updateCustomer');
+  const customer = await FincodeService.i.putCustomersId(customer_id, {})
+  console.log(customer);
+  return customer;
+}
+
+const deleteCustomer = async (customer_id: string) => {
+  console.log('deleteCustomer');
+  const customer = await FincodeService.i.deleteCustomersId(customer_id)
   console.log(customer);
   return customer;
 }
@@ -173,6 +187,8 @@ const paymentAfterAuthentication = async (orderId: string, data: FincodeNs.Payme
   try {
     // await createCustomer();
     // await getCustomer(customer_id);
+    // await updateCustomer(customer_id);
+    // await deleteCustomer(customer_id);
     // await createCard();
     // await getCustomerCards(customerId);
     // await createOrder();
