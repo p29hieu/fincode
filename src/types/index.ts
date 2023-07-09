@@ -1,4 +1,12 @@
 export namespace FincodeNs {
+  type CardBrand = {
+    /**
+     * string[ 1 .. 50 ] characters
+     *
+     * If the international brand cannot be identified, it will be an empty string.
+     */
+    brand: "" | "VISA" | "MASTER" | "JCB" | "AMEX" | "DINERS",
+  }
   type PayType = {
     pay_type: "Card" | "Konbini" | "Paypay"
   }
@@ -294,18 +302,50 @@ export namespace FincodeNs {
   } & Record<string, string>;
 
   // https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/getCustomersCustomer_idCards
-  export type CardInfo = {
+  export type CardInfo = CardBrand & {
     customer_id: string;
     id: string;
-    default_flag: string;
+    /**
+     * string= 1 characters
+     *
+     * default flag1:ON 0:OFF
+     */
+    default_flag: "0" | "1";
     card_no: string;
+    /**
+     * string= 4 characters
+     *
+     * Card expiration date.yymm形式
+     */
     expire: string;
     holder_name: string;
+    /**
+     * string [ 1 .. 64 ] characters
+     *
+     * Card number hash value
+     */
     card_no_hash: string;
     created: string;
+    /**
+     * string^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}).(\d{3})$
+     *
+     * Update date-time YYYY/MM/dd HH:mm:ss.SSSform
+     */
     updated: string;
-    type: string;
-    brand: string;
+    /**
+     * string= 1 characters
+     *
+     * Card type
+     *
+     * 0- not clear
+     *
+     * 1- debit card
+     *
+     * 2- prepaid card
+     *
+     * 3- credit card
+     */
+    type: "0" | "1" | "2" | "3";
   };
 
   // https://docs.fincode.jp/api#tag/%E9%A1%A7%E5%AE%A2/operation/postCustomers
@@ -352,7 +392,7 @@ export namespace FincodeNs {
 
   export type PaymentExecution = CardPayment | CardPayment3DS2
 
-  export type OrderDetail = JobCode & PayType & AccessId & Partial<PayTimes> & Partial<PaymentMethod> & Partial<Tds2Type> & Partial<Tds2RetUrl> & {
+  export type OrderDetail = JobCode & PayType & AccessId & Partial<PayTimes> & Partial<PaymentMethod> & Partial<Tds2Type> & Partial<Tds2RetUrl> & CardBrand & {
     shop_id: string,
     id: string,
     /**
@@ -409,10 +449,6 @@ export namespace FincodeNs {
     merchant_name: string | null,
     send_url: string | null,
     subscription_id: string | null,
-    /**
-     * If the international brand cannot be identified, it will be an empty string.
-     */
-    brand: "VISA" | "MASTER" | "JCB" | "AMEX" | "DINERS",
     error_code: string | null,
     /**
      * YYYY/MM/dd HH:mm:ss.SSS

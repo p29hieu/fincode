@@ -1,6 +1,6 @@
 {
   "name": "fincode",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Type scripts for Fincode",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
