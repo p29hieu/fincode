@@ -622,4 +622,32 @@ export namespace FincodeNs {
      */
     list: CustomerInfo[]
   }
+
+  /**
+   * https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/deleteCustomersCustomer_idCardsId
+   */
+  export type DeleteCardSuccess = {
+    /**
+     * string [ 1 .. 60 ] characters
+     *
+     * 顧客ID
+     */
+    customer_id: string;
+
+    /**
+     * string = 25 characters
+     *
+     * カードID
+     */
+    id: string;
+
+    /**
+     * string = 1 characters
+     *
+     * 削除フラグ
+     *
+     * 必須項目
+     */
+    delete_flag: "1";
+  }
 }

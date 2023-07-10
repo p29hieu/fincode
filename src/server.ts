@@ -152,11 +152,11 @@ export class FincodeService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/deleteCustomersCustomer_idCardsId
    */
-  async deleteCustomersCustomerIdCardsId(customerId: string, cardId: string) {
-    const endpoint = "/v1/customers/{customer_id}/cards/{id}"
+  async deleteCustomersCustomerIdCardsId(customerId: string, cardId: string):Promise<FincodeNs.DeleteCardSuccess>{
+    const endpoint = "/customers/{customer_id}/cards/{id}"
       .replace("{customer_id}", customerId)
       .replace("{id}", cardId);
-    await this.service.delete(endpoint);
+    return await this.service.delete(endpoint);
   }
 
   /**
