@@ -7,7 +7,18 @@ export namespace FincodeNs {
      */
     brand: "" | "VISA" | "MASTER" | "JCB" | "AMEX" | "DINERS",
   }
-  type PayType = {
+  export type PayType = {
+    /**
+     * string
+     *
+     * Payment type
+     *
+     * Card- Credit card payment
+     *
+     * Konbini- Convenience store settlement
+     *
+     * Paypay- PayPay
+     */
     pay_type: "Card" | "Konbini" | "Paypay"
   }
 
@@ -26,7 +37,12 @@ export namespace FincodeNs {
     job_code: "AUTH" | "CAPTURE" | "CHECK"
   }
 
-  type AccessId = {
+  export type AccessId = {
+    /**
+     * string
+     *
+     * Transaction ID
+     */
     access_id: string
   }
 

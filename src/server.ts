@@ -152,7 +152,7 @@ export class FincodeService {
    *
    * ref: https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/deleteCustomersCustomer_idCardsId
    */
-  async deleteCustomersCustomerIdCardsId(customerId: string, cardId: string):Promise<FincodeNs.DeleteCardSuccess>{
+  async deleteCustomersCustomerIdCardsId(customerId: string, cardId: string): Promise<FincodeNs.DeleteCardSuccess> {
     const endpoint = "/customers/{customer_id}/cards/{id}"
       .replace("{customer_id}", customerId)
       .replace("{id}", cardId);
@@ -201,6 +201,19 @@ export class FincodeService {
     });
     return res?.data;
   }
+
+  /**
+   * [putPaymentsIdCancel](https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/operation/putPaymentsIdCancel)
+   * We will cancel the payment.
+   */
+  async putPaymentsIdCancel(orderId: string, data: FincodeNs.PayType & FincodeNs.AccessId): Promise<FincodeNs.OrderDetail> {
+    const endpoint = "/payments/{id}/cancel".replace("{id}", orderId);
+    const res = await this.service.put(endpoint, {
+      ...data,
+    });
+    return res?.data;
+  }
+
   /**
    * Analyze 3D Secure results and use that information to make payments.
    *
