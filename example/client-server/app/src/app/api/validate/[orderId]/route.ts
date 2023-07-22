@@ -1,10 +1,10 @@
-import { getTdsRetUrl } from "@/utils";
-import { FincodeClientService, FincodeService } from "fincode";
+import { fincodeServer2ndMarket } from "@/app/api/config/fincode";
+import { fincodeClient2ndMarket } from "@/utils";
 import { NextResponse } from "next/server";
 
 const acquire3DS2 = async (access_id: string) => {
   try {
-    const acquire3DS2Result = await FincodeClientService.i.acquire3DS2Result(
+    const acquire3DS2Result = await fincodeClient2ndMarket.acquire3DS2Result(
       access_id
     );
     console.log("acquire3DS2Result", acquire3DS2Result);
@@ -18,10 +18,13 @@ const paymentAfterAuthentication = async (
   access_id: string
 ) => {
   try {
-    const res = await FincodeService.i.paymentAfterAuthentication(order_id, {
-      access_id,
-      pay_type: "Card",
-    });
+    const res = await fincodeServer2ndMarket.paymentAfterAuthentication(
+      order_id,
+      {
+        access_id,
+        pay_type: "Card",
+      }
+    );
     console.log("paymentAfterAuthentication res", res);
   } catch (error: any) {
     console.error(
@@ -37,7 +40,7 @@ const paymentAfterAuthentication = async (
 };
 
 const getOrderDetail = async (orderId: string) => {
-  const res = await FincodeService.i.getPaymentsId(orderId);
+  const res = await fincodeServer2ndMarket.getPaymentsId(orderId);
   console.log("orderDetail", res);
 };
 
@@ -45,14 +48,6 @@ export async function POST(
   request: Request,
   { params }: { params: { orderId: string } }
 ) {
-  FincodeService.i.config({
-    secretKey: process.env.FINCODE_SK,
-    publicKey: process.env.NEXT_PUBLIC_FINCODE_PK,
-  });
-  FincodeClientService.i.config({
-    publicKey: process.env.NEXT_PUBLIC_FINCODE_PK,
-  });
-
   const bodyText = await request.text();
 
   const bodyParam = new URLSearchParams(bodyText);
@@ -67,7 +62,9 @@ export async function POST(
   if (["3DSMethodFinished", "3DSMethodSkipped"].includes(event)) {
     try {
       const run3DS2Authentication =
-        await FincodeService.i.perform3DS2Authentication(access_id, { param });
+        await fincodeServer2ndMarket.perform3DS2Authentication(access_id, {
+          param,
+        });
       console.log("run3DS2Authentication", access_id, run3DS2Authentication);
 
       const { challenge_url } = run3DS2Authentication;
@@ -101,5 +98,8 @@ export async function POST(
       return res;
     }
   }
-  return NextResponse.json({ message: "Purchase success!" });
+  return NextResponse.json({
+    message: "Purchase success!",
+    detail: `${process.env.NEXT_PUBLIC_FINCODE_DASHBOARD_URL}/payment/Card/${orderId}`,
+  });
 }

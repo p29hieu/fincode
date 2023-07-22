@@ -1,24 +1,17 @@
-import { FincodeClientService, FincodeService } from "fincode";
+import { fincodeServer2ndMarket } from "@/app/api/config/fincode";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request, other: { params: any }) {
-  FincodeService.i.config({
-    secretKey: process.env.FINCODE_SK,
-    publicKey: process.env.NEXT_PUBLIC_FINCODE_PK,
-  });
-  FincodeClientService.i.config({
-    publicKey: process.env.NEXT_PUBLIC_FINCODE_PK,
-  });
   const { searchParams } = new URL(request.url);
 
   const amount = +(searchParams.get("amount") ?? "0");
 
   try {
-    const order = await FincodeService.i.createOrder({
+    const order = await fincodeServer2ndMarket.createOrder({
       amount,
       job_code: "AUTH",
       pay_type: "Card",
-      tds2_type: "2",
+      tds2_type: "3",
       tds_type: "2",
       td_tenant_name: "THIS IS MY ORDER",
     });

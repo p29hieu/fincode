@@ -1,5 +1,7 @@
 "use client";
-import { FincodeClientService, FincodeNs, FincodeService } from "fincode";
+import { fincodeClient2ndMarket } from "@/utils";
+import { FincodeNs } from "fincode";
+import Link from "next/link";
 import React, { useCallback, useEffect, useState } from "react";
 
 type PurchaseDataResponse = {
@@ -9,9 +11,7 @@ type PurchaseDataResponse = {
 const PaymentPage = () => {
   const [amount, setAmount] = useState<number>(1000);
   const [purchaseData, setPurchaseData] = useState<PurchaseDataResponse>();
-  const [customerId, setCustomerId] = useState<string>(
-    "c_poJq9ZToSN2rnvrz_Sm8LQ"
-  );
+  const [customerId, setCustomerId] = useState<string>();
   const [cards, setCards] = useState<FincodeNs.CardInfo[]>([]);
   const [cardSelected, setCardSelected] = useState<FincodeNs.CardInfo>();
 
@@ -41,11 +41,8 @@ const PaymentPage = () => {
   }, [purchaseData, customerId, cardSelected]);
 
   const fetchCardList = useCallback(async () => {
-    FincodeClientService.i.config({
-      publicKey: process.env.NEXT_PUBLIC_FINCODE_PK,
-    });
     if (customerId) {
-      const cardList = await FincodeClientService.i.getCustomersCustomerIdCards(
+      const cardList = await fincodeClient2ndMarket.getCustomersCustomerIdCards(
         customerId
       );
       const cardSelected = cardList.list.findLast(
@@ -177,6 +174,8 @@ const PaymentPage = () => {
           <></>
         )}
       </div>
+
+      <Link href="/payment/card">Payment with card</Link>
     </div>
   );
 };
