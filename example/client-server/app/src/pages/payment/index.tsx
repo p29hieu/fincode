@@ -1,8 +1,8 @@
 "use client";
-import { fincodeClient2ndMarket } from "@/utils";
+import { fincodeClient } from "@/utils";
 import { FincodeNs } from "fincode";
 import Link from "next/link";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type PurchaseDataResponse = {
   access_id: string;
@@ -42,7 +42,7 @@ const PaymentPage = () => {
 
   const fetchCardList = useCallback(async () => {
     if (customerId) {
-      const cardList = await fincodeClient2ndMarket.getCustomersCustomerIdCards(
+      const cardList = await fincodeClient.getCustomersCustomerIdCards(
         customerId
       );
       const cardSelected = cardList.list.findLast(

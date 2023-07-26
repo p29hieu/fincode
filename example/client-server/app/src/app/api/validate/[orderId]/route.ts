@@ -1,10 +1,10 @@
-import { fincodeServer2ndMarket } from "@/app/api/config/fincode";
-import { fincodeClient2ndMarket } from "@/utils";
+import { fincodeServer } from "@/app/api/config/fincode";
+import { fincodeClient } from "@/utils";
 import { NextResponse } from "next/server";
 
 const acquire3DS2 = async (access_id: string) => {
   try {
-    const acquire3DS2Result = await fincodeClient2ndMarket.acquire3DS2Result(
+    const acquire3DS2Result = await fincodeClient.acquire3DS2Result(
       access_id
     );
     console.log("acquire3DS2Result", acquire3DS2Result);
@@ -18,7 +18,7 @@ const paymentAfterAuthentication = async (
   access_id: string
 ) => {
   try {
-    const res = await fincodeServer2ndMarket.paymentAfterAuthentication(
+    const res = await fincodeServer.paymentAfterAuthentication(
       order_id,
       {
         access_id,
@@ -27,11 +27,6 @@ const paymentAfterAuthentication = async (
     );
     console.log("paymentAfterAuthentication res", res);
   } catch (error: any) {
-    console.error(
-      "paymentAfterAuthentication error",
-      error?.response?.data ?? error
-    );
-
     return NextResponse.json({
       message: "paymentAfterAuthentication error",
       error: error?.response?.data ?? error,
@@ -40,7 +35,7 @@ const paymentAfterAuthentication = async (
 };
 
 const getOrderDetail = async (orderId: string) => {
-  const res = await fincodeServer2ndMarket.getPaymentsId(orderId);
+  const res = await fincodeServer.getPaymentsId(orderId);
   console.log("orderDetail", res);
 };
 
@@ -62,7 +57,7 @@ export async function POST(
   if (["3DSMethodFinished", "3DSMethodSkipped"].includes(event)) {
     try {
       const run3DS2Authentication =
-        await fincodeServer2ndMarket.perform3DS2Authentication(access_id, {
+        await fincodeServer.perform3DS2Authentication(access_id, {
           param,
         });
       console.log("run3DS2Authentication", access_id, run3DS2Authentication);

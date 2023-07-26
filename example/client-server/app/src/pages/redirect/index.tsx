@@ -19,10 +19,10 @@ const ValidatePaymentPage = () => {
 
   return (
     <div>
-      Redirecting...
+      Redirecting... to {redirectUrl}
       <div>
         <a href={redirectUrl} target="_blank">
-          {redirectUrl}
+          Click here to redirect
         </a>
       </div>
     </div>

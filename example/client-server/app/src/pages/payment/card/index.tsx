@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { FincodeNs } from "fincode";
-import { fincodeClient2ndMarket } from "@/utils";
-import Script from "next/script";
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
+import { useCallback, useState } from "react";
 
 const onFincodeReady = (
   errorCallback: (error: string) => void,
@@ -188,7 +186,7 @@ const PaymentWithCard = () => {
                 </button>
               </div>
 
-              <div className="fincode-logo">
+              <div className="fincode-logo flex items-center">
                 <div>Powered by</div>
                 <div>
                   <Image
@@ -203,7 +201,9 @@ const PaymentWithCard = () => {
           </div>
         </div>
 
-        <Link href="https://docs.fincode.jp/develop_support/test_resources">Card test</Link>
+        <Link href="https://docs.fincode.jp/develop_support/test_resources">
+          See the card test
+        </Link>
         <div className="break-all">CardToken: {cardToken}</div>
         {purchaseData?.id && cardToken && (
           <div>
@@ -215,7 +215,7 @@ const PaymentWithCard = () => {
           src={process.env.NEXT_PUBLIC_FINCODE_JS}
           onReady={() =>
             onFincodeReady(setError, {
-              fincodePk: process.env.NEXT_PUBLIC_FINCODE_2ND_PK ?? "",
+              fincodePk: process.env.NEXT_PUBLIC_FINCODE_PK ?? "",
               onGetCardTokenSuccess,
             })
           }

@@ -1,4 +1,4 @@
-import { fincodeServer2ndMarket } from "@/app/api/config/fincode";
+import { fincodeServer } from "@/app/api/config/fincode";
 import { getTdsRetUrl } from "@/utils";
 import { FincodeNs } from "fincode";
 import { NextResponse } from "next/server";
@@ -20,7 +20,7 @@ export async function GET(request: Request, other: { params: any }) {
     tds2_ret_url: getTdsRetUrl(order_id),
   };
   try {
-    const res = await fincodeServer2ndMarket.paymentExecution(order_id, data);
+    const res = await fincodeServer.paymentExecution(order_id, data);
     console.log("paymentExecution res", res);
 
     if (res.acs_url) {
