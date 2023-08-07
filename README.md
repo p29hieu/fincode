@@ -28,4 +28,4 @@
   main();
 ```
 
-> see `example/index.ts`
+> see `example/client-server/app`

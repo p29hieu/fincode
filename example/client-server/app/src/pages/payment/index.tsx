@@ -1,6 +1,7 @@
 "use client";
 import { fincodeClient } from "@/utils";
 import { FincodeNs } from "fincode";
+import Head from "next/head";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
@@ -59,6 +60,9 @@ const PaymentPage = () => {
 
   return (
     <div>
+      <Head>
+        <title>Payment with customer ID</title>
+      </Head>
       <div>
         <input
           onChange={(e) => setAmount(+(e.target.value ?? 0))}

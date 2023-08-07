@@ -1,14 +1,14 @@
-import { config } from 'dotenv';
+import { config } from "dotenv";
 config();
 
-import { FincodeService, FincodeClientService, FincodeNs } from "../src";
+import { FincodeService, FincodeClientService, FincodeNs } from "fincode";
 
 const createCustomer = async () => {
-  console.log('createCustomer');
+  console.log("createCustomer");
   const customerCreated = await FincodeService.i.postCustomers({
     email: "p29hieu@gmail.com",
     name: "p29hieu",
-  })
+  });
   console.log(customerCreated);
   /**
 {
@@ -29,35 +29,35 @@ const createCustomer = async () => {
   updated: '2023/05/22 10:07:58.747'
 }
    */
-}
+};
 
 const getCustomer = async (customer_id: string) => {
-  console.log('getCustomer');
-  const customer = await FincodeClientService.i.getCustomersId(customer_id)
+  console.log("getCustomer");
+  const customer = await FincodeClientService.i.getCustomersId(customer_id);
   console.log(customer);
   return customer;
-}
+};
 
 const updateCustomer = async (customer_id: string) => {
-  console.log('updateCustomer');
-  const customer = await FincodeService.i.putCustomersId(customer_id, {})
+  console.log("updateCustomer");
+  const customer = await FincodeService.i.putCustomersId(customer_id, {});
   console.log(customer);
   return customer;
-}
+};
 
 const deleteCustomer = async (customer_id: string) => {
-  console.log('deleteCustomer');
-  const customer = await FincodeService.i.deleteCustomersId(customer_id)
+  console.log("deleteCustomer");
+  const customer = await FincodeService.i.deleteCustomersId(customer_id);
   console.log(customer);
   return customer;
-}
+};
 
 const createCard = async () => {
-  console.log('createCard');
-  const card = await FincodeService.i.registerCard('c_poJq9ZToSN2rnvrz_Sm8LQ', {
+  console.log("createCard");
+  const card = await FincodeService.i.registerCard("c_poJq9ZToSN2rnvrz_Sm8LQ", {
     default_flag: "1",
-    token: "34303634643431666661633536333364613466643637643062636261393635636534666263306666313736353136633138303063346532643834376162396163"
-  })
+    token: "34303634643431666661633536333364613466643637643062636261393635636534666263306666313736353136633138303063346532643834376162396163",
+  });
   console.log(card);
   /**
 {
@@ -73,11 +73,11 @@ const createCard = async () => {
   type: '0',
   brand: 'VISA'
 } */
-}
+};
 
 const getCustomerCards = async (customer_id: string) => {
-  console.log('getCustomerCards');
-  const cards = await FincodeClientService.i.getCustomersCustomerIdCards(customer_id)
+  console.log("getCustomerCards");
+  const cards = await FincodeClientService.i.getCustomersCustomerIdCards(customer_id);
   console.log(cards);
   /**
 {
@@ -98,7 +98,7 @@ const getCustomerCards = async (customer_id: string) => {
   ]
 }
    */
-}
+};
 
 const createOrder = async () => {
   const order = await FincodeService.i.createOrder({
@@ -114,7 +114,7 @@ const createOrder = async () => {
   id: 'o_j5Y2sbz-SuuLpdCfF4WyDg'
 }
    */
-}
+};
 
 const createOrder3DS2 = async () => {
   const order = await FincodeService.i.createOrder({
@@ -122,67 +122,67 @@ const createOrder3DS2 = async () => {
     amount: 1000,
     pay_type: "Card",
     tds_type: "2",
-    tds2_type: "2"
+    tds2_type: "2",
   });
   console.log(order);
   return order;
-}
+};
 
 const purchaseOrder = async (orderId: string, data: FincodeNs.PaymentExecution) => {
-  console.log('purchaseOrder');
+  console.log("purchaseOrder");
   const res = await FincodeService.i.paymentExecution(orderId, data);
   console.log(res);
   return res;
-}
+};
 
 const getPaymentsId = async (orderId: string) => {
-  console.log('getPaymentsId');
-  const res = await FincodeService.i.getPaymentsId(orderId)
+  console.log("getPaymentsId");
+  const res = await FincodeService.i.getPaymentsId(orderId);
   console.log(res);
   return res;
-}
+};
 
 const run3DS2AuthenticationByServer = async (access_id: string, param: string) => {
   console.log("run3DS2AuthenticationByServer");
-  const res = await FincodeService.i.perform3DS2Authentication(access_id, { param })
+  const res = await FincodeService.i.perform3DS2Authentication(access_id, { param });
   console.log(res);
   return res;
-}
+};
 
 const confirmSales = async (orderId: string, data: FincodeNs.ConfirmSales) => {
   console.log("confirmSales");
-  const res = await FincodeService.i.putPaymentsIdCapture(orderId, data)
+  const res = await FincodeService.i.putPaymentsIdCapture(orderId, data);
   console.log(res);
   return res;
-}
+};
 
 const get3DS2Result = async (access_id: string) => {
   console.log("get3DS2Result");
-  const res = await FincodeClientService.i.acquire3DS2Result(access_id)
+  const res = await FincodeClientService.i.acquire3DS2Result(access_id);
   console.log(res);
   return res;
-}
+};
 
 const paymentAfterAuthentication = async (orderId: string, data: FincodeNs.PaymentAfterAuthentication) => {
   console.log("paymentAfterAuthentication");
-  const res = await FincodeService.i.paymentAfterAuthentication(orderId, data)
+  const res = await FincodeService.i.paymentAfterAuthentication(orderId, data);
   console.log(res);
   return res;
-}
+};
 
-(async () => {
+export const payment = async () => {
   FincodeService.i.config({
     secretKey: process.env.FINCODE_SK,
-    publicKey: process.env.FINCODE_PK
+    publicKey: process.env.FINCODE_PK,
   });
   FincodeClientService.i.config({
-    publicKey: process.env.FINCODE_PK
+    publicKey: process.env.FINCODE_PK,
   });
 
-  const customer_id = 'c_poJq9ZToSN2rnvrz_Sm8LQ';
-  const card_id = 'cs_iADgG895QAq3XNcPIVfQ0g';
-  const access_id = 'a_wIbuF0tMT5eX3VQXWle0nA';
-  const orderId = 'o_SAUxyv9SSKKuaRqIvqoJjQ';
+  const customer_id = "c_poJq9ZToSN2rnvrz_Sm8LQ";
+  const card_id = "cs_iADgG895QAq3XNcPIVfQ0g";
+  const access_id = "a_wIbuF0tMT5eX3VQXWle0nA";
+  const orderId = "o_SAUxyv9SSKKuaRqIvqoJjQ";
 
   try {
     // await createCustomer();
@@ -207,7 +207,7 @@ const paymentAfterAuthentication = async (orderId: string, data: FincodeNs.Payme
     // await getPaymentsId(orderId);
 
     // 3DS2: https://docs.fincode.jp/payment/fraud_protection/3d_secure_2
-    const tds2_ret_url = `http://localhost:3000/redirect`
+    const tds2_ret_url = `http://localhost:3000/redirect`;
     // step 1: choose customer_id and card_id
     // step2: merchants create order (settlement registration)
     // await createOrder3DS2();
@@ -237,6 +237,6 @@ const paymentAfterAuthentication = async (orderId: string, data: FincodeNs.Payme
     // });
     // await getPaymentsId(orderId);
   } catch (error: any) {
-    console.error(error?.response?.data ?? error)
+    console.error(error?.response?.data ?? error);
   }
-})();
+};

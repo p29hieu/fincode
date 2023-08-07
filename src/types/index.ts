@@ -19,7 +19,7 @@ export namespace FincodeNs {
      *
      * Paypay- PayPay
      */
-    pay_type: "Card" | "Konbini" | "Paypay"
+    pay_type: "Card" | "Konbini" | "Paypay" | "Applepay"
   }
 
   type JobCode = {

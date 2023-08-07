@@ -1,5 +1,6 @@
 "use client";
 
+import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
@@ -119,6 +120,9 @@ const PaymentWithCard = () => {
 
   return (
     <div>
+      <Head>
+        <title>Payment with card</title>
+      </Head>
       <div>
         <input
           onChange={(e) => setAmount(+(e.target.value ?? 0))}
@@ -213,7 +217,7 @@ const PaymentWithCard = () => {
 
         <Script
           src={process.env.NEXT_PUBLIC_FINCODE_JS}
-          onReady={() =>
+          onLoad={() =>
             onFincodeReady(setError, {
               fincodePk: process.env.NEXT_PUBLIC_FINCODE_PK ?? "",
               onGetCardTokenSuccess,

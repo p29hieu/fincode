@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.0.3",
-    "fincode": "../"
+    "fincode": "../../"
   },
   "devDependencies": {
     "@types/node": "^20.2.1",

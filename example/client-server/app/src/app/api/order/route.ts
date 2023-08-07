@@ -12,7 +12,8 @@ export async function POST(request: Request, other: { params: any }) {
       pay_type: "Card",
       tds2_type: "2",
       tds_type: "2",
-      td_tenant_name: "THIS IS MY ORDER",
+      td_tenant_name: "MikoSea Inc",
+      client_field_1: "STATE_abcd",
     });
     console.log("=== order created", order);
 
