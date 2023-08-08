@@ -3,76 +3,62 @@ import { getTdsRetUrl } from "@/utils";
 import { FincodeNs } from "fincode";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, other: { params: any }) {
-  const { searchParams } = new URL(request.url);
-  const order_id = searchParams.get("order_id") ?? "";
-  const access_id = searchParams.get("access_id") ?? "";
-  const card_id = searchParams.get("card_id") ?? undefined;
-  const customer_id = searchParams.get("customer_id") ?? undefined;
-  const token = searchParams.get("token") ?? undefined;
-  const data: FincodeNs.PaymentExecution = {
-    access_id,
-    pay_type: "Card",
-    card_id,
-    customer_id,
-    token,
-    method: 1,
-    tds2_ret_url: getTdsRetUrl(order_id),
-  };
-  try {
-    const res = await fincodeServer.paymentExecution(order_id, data);
-    console.log("paymentExecution res", res);
-
-    if (res.acs_url) {
-      const urlSearch = new URLSearchParams();
-      urlSearch.set("url", res.acs_url);
-      return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/redirect?${urlSearch.toString()}`
-      );
-    }
-    return NextResponse.json(res);
-  } catch (error: any) {
-    console.error(error?.response?.data ?? error);
-    return NextResponse.json({
-      ...error?.response?.data,
-      message: "Error when purchase",
-    });
-  }
-}
-
+export type PurchaseDto = Pick<
+  FincodeNs.PaymentExecution,
+  "card_id" | "customer_id" | "pay_type" | "token"
+> & {
+  amount: number;
+  useSecurity: boolean;
+  appUrl: string;
+};
 export async function POST(request: Request, other: { params: any }) {
-  const searchParams = new URLSearchParams(await request.text());
-  const order_id = searchParams.get("order_id") ?? "";
-  const access_id = searchParams.get("access_id") ?? "";
-  const card_id = searchParams.get("card_id") ?? undefined;
-  const customer_id = searchParams.get("customer_id") ?? undefined;
-  const token = searchParams.get("token") ?? undefined;
-  const data: FincodeNs.PaymentExecution = {
-    access_id,
-    pay_type: "Card",
-    card_id,
-    customer_id,
-    token,
-    method: 1,
-    tds2_ret_url: getTdsRetUrl(order_id),
-  };
+  const { amount, useSecurity, appUrl, ...paymentData } =
+    (await request.json()) as PurchaseDto;
   try {
-    const res = await fincodeServer.paymentExecution(order_id, data);
-    console.log("paymentExecution res", res);
+    const orderId = `order_${Date.now()}`
+    const order = await fincodeServer.createOrder({
+      amount,
+      job_code: "CAPTURE",
+      pay_type: paymentData.pay_type,
+      client_field_1: "TEST",
+      id: orderId,
+      td_tenant_name: "MikoSea Inc. Payment testing",
+      ...(useSecurity
+        ? {
+            tds_type: "2",
+            tds2_type: "3",
+          }
+        : {
+            tds_type: "0",
+          }),
+    });
+    console.log("==== Order created", order);
+    const data: FincodeNs.PaymentExecution = {
+      ...paymentData,
+      access_id: order.access_id,
+      method: 1,
+      ...(useSecurity
+        ? {
+            tds2_ret_url: getTdsRetUrl(appUrl, orderId),
+          }
+        : {}),
+    };
+    console.log("==== PaymentExecution data", data);
 
-    if (res.acs_url) {
-      const urlSearch = new URLSearchParams();
-      urlSearch.set("url", res.acs_url);
-      return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/redirect?${urlSearch.toString()}`
-      );
-    }
-    return NextResponse.json(res);
+    const paymentExecutionRes = await fincodeServer.paymentExecution(
+      order.id,
+      data
+    );
+    console.log("==== paymentExecution res", paymentExecutionRes);
+    return NextResponse.json({
+      order_id: orderId,
+      acs_url: paymentExecutionRes.acs_url,
+    });
   } catch (error: any) {
     console.error(error?.response?.data ?? error);
+    const message = JSON.stringify(error?.response?.data);
     return NextResponse.json({
-      ...error?.response?.data,
-      message: "Error when purchase",
+      message,
     });
   }
 }

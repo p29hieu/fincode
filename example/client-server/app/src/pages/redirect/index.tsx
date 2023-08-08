@@ -10,7 +10,7 @@ const ValidatePaymentPage = () => {
     const { url } = router.query;
     if (url) {
       setRedirectUrl(`${url}`);
-      // router.replace(`${url}`)
+      router.replace(`${url}`)
       // setTimeout(() => {
       //   window.open(`${url}`, "_blank");
       // }, 300);

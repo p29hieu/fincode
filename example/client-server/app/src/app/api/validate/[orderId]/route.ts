@@ -1,12 +1,11 @@
 import { fincodeServer } from "@/app/api/config/fincode";
 import { fincodeClient } from "@/utils";
 import { NextResponse } from "next/server";
+import { FincodeNs } from "fincode";
 
 const acquire3DS2 = async (access_id: string) => {
   try {
-    const acquire3DS2Result = await fincodeClient.acquire3DS2Result(
-      access_id
-    );
+    const acquire3DS2Result = await fincodeClient.acquire3DS2Result(access_id);
     console.log("acquire3DS2Result", acquire3DS2Result);
   } catch (error: any) {
     console.error("acquire3DS2Result error", error?.response?.data);
@@ -15,16 +14,10 @@ const acquire3DS2 = async (access_id: string) => {
 
 const paymentAfterAuthentication = async (
   order_id: string,
-  access_id: string
+  data: FincodeNs.PaymentAfterAuthentication
 ) => {
   try {
-    const res = await fincodeServer.paymentAfterAuthentication(
-      order_id,
-      {
-        access_id,
-        pay_type: "Card",
-      }
-    );
+    const res = await fincodeServer.paymentAfterAuthentication(order_id, data);
     console.log("paymentAfterAuthentication res", res);
   } catch (error: any) {
     return NextResponse.json({
@@ -32,11 +25,6 @@ const paymentAfterAuthentication = async (
       error: error?.response?.data ?? error,
     });
   }
-};
-
-const getOrderDetail = async (orderId: string) => {
-  const res = await fincodeServer.getPaymentsId(orderId);
-  console.log("orderDetail", res);
 };
 
 export async function POST(
@@ -51,9 +39,11 @@ export async function POST(
 
   const { searchParams } = new URL(request.url);
   const access_id = searchParams.get("MD") ?? "";
+  const appUrl = searchParams.get("appUrl") ?? ""; // require name appURL, see in getTdsRetUrl
   const { orderId } = params;
   console.log("validate", { bodyText, searchParams, params });
 
+  const order = await fincodeServer.getPaymentsId(orderId);
   if (["3DSMethodFinished", "3DSMethodSkipped"].includes(event)) {
     try {
       const run3DS2Authentication =
@@ -67,13 +57,13 @@ export async function POST(
         const urlSearch = new URLSearchParams();
         urlSearch.set("url", challenge_url);
         return NextResponse.redirect(
-          `${process.env.NEXT_PUBLIC_APP_URL}/redirect?${urlSearch.toString()}`
+          `${appUrl}/redirect?${urlSearch.toString()}`
         );
       } else {
-        const res = await paymentAfterAuthentication(orderId, access_id);
-        if (res) {
-          return res;
-        }
+        await paymentAfterAuthentication(orderId, {
+          access_id: order.access_id,
+          pay_type: order.pay_type,
+        });
       }
     } catch (error: any) {
       console.error(
@@ -88,10 +78,10 @@ export async function POST(
   }
   if (["AuthResultReady"].includes(event)) {
     await acquire3DS2(access_id);
-    const res = await paymentAfterAuthentication(orderId, access_id);
-    if (res) {
-      return res;
-    }
+    await paymentAfterAuthentication(orderId, {
+      access_id: order.access_id,
+      pay_type: order.pay_type,
+    });
   }
   return NextResponse.json({
     message: "Purchase success!",
