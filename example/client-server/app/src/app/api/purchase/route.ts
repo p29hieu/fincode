@@ -11,11 +11,16 @@ export type PurchaseDto = Pick<
   useSecurity: boolean;
   appUrl: string;
 };
+
+export type PurchaseDtoRes = {
+  order_id: string;
+  acs_url: string | undefined;
+};
 export async function POST(request: Request, other: { params: any }) {
   const { amount, useSecurity, appUrl, ...paymentData } =
     (await request.json()) as PurchaseDto;
   try {
-    const orderId = `order_${Date.now()}`
+    const orderId = `order_test_${Date.now()}`;
     const order = await fincodeServer.createOrder({
       amount,
       job_code: "CAPTURE",
@@ -33,7 +38,7 @@ export async function POST(request: Request, other: { params: any }) {
           }),
     });
     console.log("==== Order created", order);
-    const data: FincodeNs.PaymentExecution = {
+    const paymentExecutionData: FincodeNs.PaymentExecution = {
       ...paymentData,
       access_id: order.access_id,
       method: 1,
@@ -43,11 +48,11 @@ export async function POST(request: Request, other: { params: any }) {
           }
         : {}),
     };
-    console.log("==== PaymentExecution data", data);
+    console.log("==== PaymentExecution data", paymentExecutionData);
 
     const paymentExecutionRes = await fincodeServer.paymentExecution(
       order.id,
-      data
+      paymentExecutionData
     );
     console.log("==== paymentExecution res", paymentExecutionRes);
     return NextResponse.json({
@@ -57,8 +62,11 @@ export async function POST(request: Request, other: { params: any }) {
   } catch (error: any) {
     console.error(error?.response?.data ?? error);
     const message = JSON.stringify(error?.response?.data);
-    return NextResponse.json({
-      message,
-    });
+    return NextResponse.json(
+      {
+        message,
+      },
+      { status: 400 }
+    );
   }
 }

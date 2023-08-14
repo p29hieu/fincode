@@ -4,37 +4,38 @@ import Head from "next/head";
 import Script from "next/script";
 import { useCallback, useState } from "react";
 
-const onAppleJsReady = async (
-  errorCallback: (error: string) => void,
-  options: {
-    amount: number;
-    onGetCardTokenSuccess: (token: string) => void;
-  }
-) => {
+import { PurchaseDto, PurchaseDtoRes } from "@/app/api/purchase/route";
+import { useRouter } from "next/dist/client/router";
+
+const onAppleJsReady = async (options: {
+  label: string;
+  amount: number;
+  onGetCardTokenSuccess: (token: string) => Promise<void>;
+}) => {
   const APPLE_PAY_SUPPORTED_VERSION = 3; /* Apple PayJSのサポートバージョン */
-  const MARCHANT_IDENTIFIER =
-    process.env.NEXT_PUBLIC_APPLE_PAY_MERCHANT_ID ??
-    "merchant.com.example"; /* マーチャントID */
   const APPLE_PAY_BUTTON_ID = "apple-pay-button"; /* Apple Payボタン要素のID */
   const applePayButton = document.getElementById(`${APPLE_PAY_BUTTON_ID}`);
-  if (!applePayButton) {
+  const loadingIcon = document.getElementById(`loading-icon`);
+  if (!applePayButton || !loadingIcon) {
     return;
   }
   applePayButton.style.display = "none";
+  loadingIcon.style.display = "none";
   /**
    * 各ショップで作成したマーチャントID検証用のURL
    * https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/providing_merchant_validation
    */
   const MERCHANT_VALIDATION_URL = "/api/apple-pay/validate";
   if (window.ApplePaySession) {
-    const canMakePaymentsWithActiveCard =
-      await ApplePaySession.canMakePaymentsWithActiveCard(MARCHANT_IDENTIFIER);
+    applePayButton.style.display = "unset";
+    loadingIcon.style.display = "unset";
+    const canMakePayments = ApplePaySession.canMakePayments();
     if (
       ApplePaySession.supportsVersion(APPLE_PAY_SUPPORTED_VERSION) &&
-      canMakePaymentsWithActiveCard
+      canMakePayments
     ) {
-      applePayButton.style.display = "unset";
       applePayButton.addEventListener("click", function () {
+        console.log("applePayButton CLICK");
         /* 商品の情報 */
         let request = {
           countryCode: "JP",
@@ -43,7 +44,7 @@ const onAppleJsReady = async (
           supportedNetworks: ["visa", "masterCard", "jcb", "amex"],
           merchantCapabilities: ["supports3DS"],
           total: {
-            label: "Apple Pay Order test",
+            label: options.label,
             amount: `${options.amount}`, // ¥
           },
         };
@@ -71,108 +72,116 @@ const onAppleJsReady = async (
         };
         /* 購入者が支払いを承認した時に呼ばれる */
         session.onpaymentauthorized = function (event) {
-          const token = event.payment.token;
           console.log("===onpaymentauthorized", event);
-          console.log(token);
+          const token = event.payment.token.paymentData;
           /* base64エンコードしたトークンをfincodeの決済実行APIのtokenに設定する */
           const encodedToken = btoa(JSON.stringify(token));
-          options.onGetCardTokenSuccess(encodedToken);
+          options
+            .onGetCardTokenSuccess(encodedToken)
+            .then((r) => {
+              session.completePayment(ApplePaySession.STATUS_SUCCESS);
+            })
+            .catch(() => {
+              session.completePayment(ApplePaySession.STATUS_FAILURE);
+            });
         };
         session.begin();
       });
+      loadingIcon.style.display = "none";
+    } else {
+      console.log({ canMakePayments });
+      applePayButton.style.display = "none";
+      loadingIcon.style.display = "none";
     }
   }
 };
 
-type PurchaseDataResponse = {
-  access_id: string;
-  id: string;
-};
 const ApplePayPayment = () => {
-  const [amount, setAmount] = useState<number>(1000);
-  const [order, setOrder] = useState<PurchaseDataResponse>({
-    access_id: "test",
-    id: "test",
-  });
-  const [cardToken, setCardToken] = useState<string>();
-  const [error, setError] = useState("");
+  const [amount, setAmount] = useState<string>("100");
+  const [changingAmount, setChangingAmount] = useState(false);
+  const [purchasing, setPurchasing] = useState(false);
 
-  const handleCreateOrder = useCallback(async () => {
-    const response = await fetch(`/api/order?amount=${amount}`, {
-      method: "POST",
-    })
-      .then(async (r) => (await r.json()) as PurchaseDataResponse)
-      .catch((error) => {
-        console.error(error);
-      });
-    if (response) {
-      setOrder(response);
-    }
-  }, [amount]);
+  const router = useRouter();
 
-  const handlePayment = useCallback(async () => {
-    if (!order || !cardToken) {
-      return;
-    }
-    const urlSearch = new URLSearchParams();
-    urlSearch.set("access_id", order.access_id);
-    urlSearch.set("order_id", order.id);
-    urlSearch.set("token", cardToken);
-    await fetch("/api/purchase", {
-      method: "POST",
-      body: JSON.stringify({
-        ...order,
-        token: cardToken,
-      }),
-    });
-  }, [order, cardToken]);
-
-  const onGetCardTokenSuccess = (cardToken: string) => {
-    setCardToken(cardToken);
-  };
+  const handlePayment = useCallback(
+    async (token: string) => {
+      if (!token && !+amount) {
+        return;
+      }
+      setPurchasing(true);
+      const body: PurchaseDto = {
+        amount: +amount,
+        appUrl: window.origin,
+        pay_type: "Applepay",
+        useSecurity: false,
+        token,
+      };
+      try {
+        const res = await fetch("/api/purchase", {
+          method: "POST",
+          body: JSON.stringify(body),
+        }).then(async (r) => {
+          const res = await r.json();
+          if (r.ok) {
+            return res as PurchaseDtoRes;
+          }
+          throw res;
+        });
+        setTimeout(() => {
+          if (res.acs_url) {
+            router.push(res.acs_url);
+            return;
+          }
+          alert("Purchased success!");
+        }, 1000);
+      } catch (error) {
+        console.error("error when purchase", error);
+        setTimeout(() => {
+          alert(JSON.stringify(error));
+        }, 1000);
+        throw error;
+      } finally {
+        setPurchasing(false);
+      }
+    },
+    [amount, router]
+  );
 
   return (
     <div>
       <Head>
         <title>Apple payment</title>
       </Head>
-      <div>
+      <div className="p-12">
         <input
-          onChange={(e) => setAmount(+(e.target.value ?? 0))}
+          onChange={(e) => {
+            const value = e.target.value;
+            setChangingAmount(true);
+            setAmount(value || "");
+            setTimeout(() => {
+              setChangingAmount(false);
+            }, 300);
+          }}
           placeholder="Amount"
           type="number"
-          min={0}
-          defaultValue={amount}
+          value={amount}
+          min={1}
+          max={999999}
         />
-        {amount > 0 ? (
-          <button onClick={handleCreateOrder}>create order</button>
+        <button
+          disabled={purchasing}
+          onClick={() => {
+            setAmount("");
+          }}
+        >
+          Reset
+        </button>
+        {purchasing ? (
+          <div style={{ display: "none" }}>Apple-pay purchasing...</div>
         ) : (
           <></>
         )}
-        <div>
-          <div>
-            <label htmlFor="order_id">orderId:</label>
-          </div>
-          <input
-            id="order_id"
-            defaultValue={order?.id}
-            placeholder="order id"
-            disabled
-          />
-        </div>
-        <div>
-          <div>
-            <label htmlFor="access_id">accessId:</label>
-          </div>
-          <input
-            id="access_id"
-            defaultValue={order?.access_id}
-            placeholder="access id"
-            disabled
-          />
-        </div>
-
-        {order ? (
+        {+amount && !changingAmount && !purchasing ? (
           <div className="h-[200px]">
             <div className="payment-container mt-12 flex flex-col items-center">
               <div
@@ -183,31 +192,31 @@ const ApplePayPayment = () => {
                 buttonstyle="black"
                 type="buy"
                 locale="ja-JP"
+                style="display: none;"
               ></apple-pay-button>
                 `,
                 }}
               ></div>
+              <div id="loading-icon" style={{ display: "none" }}>
+                Apple-pay loading...
+              </div>
             </div>
             <Script
               src="https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js"
               crossOrigin="anonymous"
               async
               onReady={() => {
-                onAppleJsReady(setError, {
-                  amount,
-                  onGetCardTokenSuccess,
+                console.log("onAppleJsReady");
+                onAppleJsReady({
+                  amount: +amount,
+                  label: "Pay for testing",
+                  onGetCardTokenSuccess: handlePayment,
                 });
               }}
             ></Script>
           </div>
         ) : (
           <></>
-        )}
-        <div className="break-all">Apple pay token: {cardToken}</div>
-        {order?.id && cardToken && (
-          <div>
-            <button onClick={handlePayment}>Purchase</button>
-          </div>
         )}
       </div>
     </div>
