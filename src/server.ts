@@ -544,9 +544,8 @@ export class FincodeService {
       }
       return data;
     } catch (error) {
-      console.error(error.response);
       if (options?.onError) {
-        await options.onError(error.response.data);
+        await options.onError(error.response?.data);
       }
     }
   }
