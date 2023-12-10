@@ -475,18 +475,18 @@ export class FincodeService {
     }
   }
   /**
-   * [Obtain platform sales list.](https://docs.fincode.jp/api#tag/%E3%83%97%E3%83%A9%E3%83%83%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%E5%A3%B2%E4%B8%8A/operation/getPlatform_accounts)
+   * [Obtain sales payment information list](https://docs.fincode.jp/api#tag/%E5%A3%B2%E4%B8%8A%E5%85%A5%E9%87%91/operation/getAccounts)
    */
-  async getPlatformSaleList<T = FincodeNs.PlatformSale.ObtainsPlatformSalesList>(
-    params?: FincodeNs.PlatformSale.PlatformSaleListRequest,
+  async getSaleList(
+    params?: FincodeNs.Sale.SaleListRequest,
     options?: {
-      onSuccess?: FincodeNs.Callback.Success<T>;
+      onSuccess?: FincodeNs.Callback.Success<FincodeNs.Sale.SalesListResponse>;
       onError?: FincodeNs.Callback.Error;
     },
-  ): Promise<T> {
+  ): Promise<FincodeNs.Sale.SalesListResponse> {
     try {
       const endpoint = "/v1/accounts";
-      const { data } = await this.service.get<T>(`${endpoint}`, { params });
+      const { data } = await this.service.get(`${endpoint}`, { params });
       if (options?.onSuccess) {
         await options.onSuccess(data);
       }
@@ -498,23 +498,53 @@ export class FincodeService {
     }
   }
   /**
-   * [Obtain platform sales](https://docs.fincode.jp/api#tag/%E3%83%97%E3%83%A9%E3%83%83%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%E5%A3%B2%E4%B8%8A/operation/getPlatform_accountsId)
+   * [Obtain sales payment information](https://docs.fincode.jp/api#tag/%E5%A3%B2%E4%B8%8A%E5%85%A5%E9%87%91/operation/getAccountsId)
    */
-  async getPlatformSaleDetail<T = FincodeNs.PlatformSale.PlatformSaleDetail>(
+  async getSaleItem(
     ID: string,
     options?: {
-      onSuccess?: FincodeNs.Callback.Success<T>;
+      onSuccess?: FincodeNs.Callback.Success<FincodeNs.Sale.SaleItem>;
       onError?: FincodeNs.Callback.Error;
     },
-  ): Promise<T> {
+  ): Promise<FincodeNs.Sale.SaleItem> {
     try {
       const endpoint = "/v1/accounts/{id}".replace("{id}", ID);
-      const { data } = await this.service.get<T>(endpoint);
+      const { data } = await this.service.get(endpoint);
       if (options?.onSuccess) {
         await options.onSuccess(data);
       }
       return data;
     } catch (error) {
+      if (options?.onError) {
+        await options.onError(error.response.data);
+      }
+    }
+  }
+  /**
+   * [Obtain a list of detailed information on sales receipts](https://docs.fincode.jp/api#tag/%E5%A3%B2%E4%B8%8A%E5%85%A5%E9%87%91/operation/getAccountsIdDetail)
+   */
+  async getSaleDetail(
+    ID: string,
+    params: FincodeNs.Sale.SaleDetailRequest,
+    options?: {
+      onSuccess?: FincodeNs.Callback.Success<FincodeNs.Sale.SaleDetailResponse>;
+      onError?: FincodeNs.Callback.Error;
+    },
+  ): Promise<FincodeNs.Sale.SaleDetailResponse> {
+    try {
+      const endpoint = "/v1/accounts/{id}/detail".replace("{id}", ID);
+      const { data } = await this.service.get(endpoint, {
+        params: {
+          ...params,
+          trade_type: params.trade_type.join(","),
+        },
+      });
+      if (options?.onSuccess) {
+        await options.onSuccess(data);
+      }
+      return data;
+    } catch (error) {
+      console.error(error.response);
       if (options?.onError) {
         await options.onError(error.response.data);
       }

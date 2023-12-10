@@ -438,7 +438,7 @@ export namespace FincodeNs {
       shop_id: string;
       id: string;
       /**
-       * 	string[ 1 .. 15 ] characters
+       *   string[ 1 .. 15 ] characters
        *
        * payment status
        *
@@ -735,8 +735,8 @@ export namespace FincodeNs {
     delete_flag: "1";
   };
 
-  export namespace PlatformSale {
-    export type PlatformSaleItem = {
+  export namespace Sale {
+    export type SaleItem = {
       /**
        * string [ 1 .. 20 ] characters
        *
@@ -756,23 +756,55 @@ export namespace FincodeNs {
        */
       shop_id: string;
       /**
+       * Deposit amount
+       */
+      deposit_amount: number;
+      /**
+       * total amount
+       */
+      total_amount: number;
+      /**
+       * commission
+       */
+      fee_amount: number;
+      /**
+       * Web registration fee
+       */
+      web_registration_fee_amount: number;
+      /**
+       * Platform usage fee
+       */
+      platform_fee_amount: number;
+      /**
+       * Platform usage fee consumption tax
+       */
+      platform_fee_tax_amount: number;
+      /**
+       * Platform web registration usage fee
+       */
+      platform_web_registration_fee_amount: number;
+      /**
+       * Number of transactions
+       */
+      count: number;
+      /**
        * Estimated deposit date YYYY/MM/dd HH:mm Format
        */
       scheduled_deposit_date: string;
+      /**
+       * Start date of aggregation period YYYY/MM/dd HH:mm Format
+       */
+      deposit_date: string | null;
       /**
        * Aggregation period (start) YYYY/MM/dd HH:mm Format
        */
       aggregate_term_start: string;
       /**
-       * Aggregation period (end) YYYY/MM/dd HH:mm Format
+       * End date of aggregation period YYYY/MM/dd HH:mm Format
        */
       aggregate_term_end: string;
       /**
-       * Receipt date YYYY/MM/dd HH:mm Format
-       */
-      deposit_date: string | null;
-      /**
-       * Payment deadline YYYY/MM/dd HH:mm Format
+       * Payment deadline at time of billing YYYY/MM/dd HH:mm Format
        */
       payment_deadline: string | null;
       /**
@@ -782,7 +814,7 @@ export namespace FincodeNs {
       /**
        * Deposit status
        *
-       * 3001- Amount not confirmed
+       * 3001- Before the amount is confirmed
        *
        * 3002- Amount confirmed
        *
@@ -810,46 +842,6 @@ export namespace FincodeNs {
        */
       status_code: 3001 | 3002 | 3003 | 3004 | 3005 | 3006 | 3007 | 3008 | 3009 | 3010 | 3011 | 3012 | 3013;
       /**
-       * number
-       */
-      count: number;
-      /**
-       * Actuarial amount
-       */
-      settlement_amount: number;
-      /**
-       * Transfer fee
-       */
-      bank_transfer_fee: number;
-      /**
-       * total amount
-       */
-      total_amount: number;
-      /**
-       * commission
-       */
-      fee_amount: number;
-      /**
-       * Platform usage fee (excluding tax)
-       */
-      platform_fee_amout: number;
-      /**
-       * Platform usage fee consumption tax
-       */
-      platform_fee_tax_amout: number;
-      /**
-       * sale tax
-       */
-      tax_amount: number;
-      /**
-       * Deposit amount
-       */
-      deposit_amount: number;
-      /**
-       * Validation confirmation flag
-       */
-      verified: boolean;
-      /**
        * Creation date and time YYYY/MM/dd HH:mm:ss.SSS.SSS Format
        */
       created: string;
@@ -859,19 +851,15 @@ export namespace FincodeNs {
       updated: string;
     };
 
-    export type PlatformSaleListRequest = PaginationListRequest & {
+    export type SaleListRequest = PaginationListRequest & {
       /**
        * Determine the month
        */
       processed?: string;
       /**
-       * @type PlatformSaleItem["status_code"]
+       * @type SaleItem["status_code"]
        */
-      status?: PlatformSaleItem["status_code"];
-      /**
-       * Estimated deposit date. YYYY/MM/dd Format
-       */
-      scheduled?: string;
+      status?: SaleItem["status_code"];
       /**
        * Opening price of the range specified for the scheduled deposit date. YYYY/MM/dd Format
        */
@@ -882,87 +870,91 @@ export namespace FincodeNs {
       scheduled_to?: string;
     };
 
-    /**
-     * https://docs.fincode.jp/api#tag/%E3%83%97%E3%83%A9%E3%83%83%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%E5%A3%B2%E4%B8%8A/operation/getPlatform_accounts
-     */
-    export type ObtainsPlatformSalesList = PaginationListResponse<PlatformSaleItem>;
+    export type SalesListResponse = PaginationListResponse<SaleItem>;
 
-    /**
-     * https://docs.fincode.jp/api#tag/%E3%83%97%E3%83%A9%E3%83%83%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%E5%A3%B2%E4%B8%8A/operation/getPlatform_accountsId
-     */
-    export type PlatformSaleDetail = PlatformSaleItem & {
+    export type SaleDetailRequest = PaginationListRequest & {
       /**
-       * Financial institution name
-       */
-      bank_name: string;
-      /**
-       * Financial institution name kana
-       */
-      bank_name_kana: string;
-      /**
-       * Bank Code
-       */
-      bank_code: string;
-      /**
-       * Branch name
-       */
-      branch_name: string;
-      /**
-       * Branch name kana
-       */
-      branch_name_kana: string;
-      /**
-       * Branch code
-       */
-      bracnch_code: string;
-      /**
-       * Account type
+       * Obtains sales receipt information for one deposit in transaction units Please note that the handling of the amount differs depending on the trade_type (trade type). Please refer to the table below for details.
        *
-       * 0- normal
+       * 1(settlement) The amount will be added (+) and reflected in the sales payment information.
        *
-       * 1- Immediate
+       * 2(refund)  The amount will be subtracted (-) and reflected in the sales receipt information.
+       *
+       * 3(chargeback)  The amount will be subtracted (-) and reflected in the sales receipt information.
+       *
+       * 4(Adjustment)  The amount will be added (+) and reflected in the sales payment information. A negative amount may be returned.
+       *
+       * 5(chargeback cancellation)  The amount will be added (+) and reflected in the sales payment information.
        */
-      account_kind: 0 | 1;
-      /**
-       * account number
-       */
-      account_number: string;
-      /**
-       * Account holder
-       */
-      account_name: string;
+      trade_type: Array<1 | 2 | 3 | 4 | 5>;
     };
-
-    export type PlatformSaleSummaryItem = Pick<
-      PlatformSaleItem,
-      | "account_id"
-      | "shop_id"
-      | "scheduled_deposit_date"
-      | "aggregate_term_start"
-      | "aggregate_term_end"
-      | "deposit_date"
-      | "count"
-      | "settlement_amount"
-      | "bank_transfer_fee"
-      | "total_amount"
-      | "fee_amount"
-      | "platform_fee_amout"
-      | "platform_fee_tax_amout"
-      | "tax_amount"
-      | "deposit_amount"
-      | "verified"
-      | "created"
-      | "updated"
-    > & {
-      /**
-       * Platform fee sales summary ID
-       */
-      summary_id: string;
-    };
-
-    /**
-     * https://docs.fincode.jp/api#tag/%E3%83%97%E3%83%A9%E3%83%83%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%E5%A3%B2%E4%B8%8A/operation/getPlatform_accountsIdSummary
-     */
-    export type PlatformSaleSummaryList = PaginationListResponse<PlatformSaleSummaryItem>;
+    export type SaleDetailItem = Pick<
+      SaleItem,
+      "account_id" | "shop_id" | "deposit_amount" | "aggregate_term_start" | "aggregate_term_end" | "created" | "updated"
+    > &
+      Pick<SaleDetailRequest, "trade_type"> &
+      AccessId & {
+        /**
+         * Actuarial Detail ID
+         */
+        detail_id: number;
+        /**
+         * `VM` Card payment (VISA/MASTER)
+         *
+         * `AND` Card payment (JCB/AMEX/DINERS)
+         *
+         * `KONBINI` Convenience store settlement
+         *
+         * `PayPay` PayPay payment
+         *
+         * `ApplepayVM` Apple Pay payment (VISA/MASTER)
+         *
+         * `ApplepayJA` Apple Pay payment (JCB/AMEX/DINERS)
+         *
+         * `Directdebit` Account transfer
+         */
+        payment_method: "VM" | "AND" | "KONBINI" | "PayPay" | "ApplepayVM" | "ApplepayJA" | "Directdebit";
+        /**
+         * Order ID
+         */
+        order_id: string;
+        amount: number;
+        tax: number;
+        fee_total: number;
+        fee_total_taxin: number;
+        fee_profit_tax: number;
+        fee_profit: number;
+        fee_cost: number;
+        fee_rate_total: number;
+        fixed_fee: number;
+        /**
+         * fincode fee rate applicable category
+         *
+         * 0: Rate
+         *
+         * 1: Minimum fee
+         */
+        apply_type: 0 | 1;
+        web_registration_fee: number;
+        web_registration_fee_taxin: number;
+        web_registration_fee_tax: number;
+        platform_fee: number;
+        platform_fee_taxin: number;
+        platform_fee_rate: number;
+        fixed_fee_for_platform_fee: number;
+        /**
+         * Platform usage fee applicable category
+         *
+         * 0: Rate
+         *
+         * 1: Minimum utilization material
+         */
+        apply_type_for_platform_fee: 0 | 1;
+        platform_web_registration_fee: number;
+        platform_web_registration_fee_taxin: number;
+        platform_web_registration_fee_tax: number;
+        processed_date: string;
+      };
+    export type SaleDetailResponse = PaginationListResponse<SaleDetailItem>;
   }
 }
