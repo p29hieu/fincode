@@ -1,3 +1,6 @@
+```
+From version 1.0.0, each function has the `onError` as a callback, doesn't throw the error anymore.
+```
 # Install
 ```bash
   yarn add fincode

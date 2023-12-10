@@ -1,12 +1,26 @@
 export namespace FincodeNs {
+  export type ErrorItem = {
+    error_code: string;
+    error_message: string;
+  };
+
+  export type FincodeErrors = {
+    errors: ErrorItem[];
+  };
+
+  export namespace Callback {
+    export type Success<T> = (data: T) => void | PromiseLike<void> | Promise<void>;
+    export type Error = (error: FincodeErrors) => void | PromiseLike<void> | Promise<void>;
+  }
+
   type CardBrand = {
     /**
      * string[ 1 .. 50 ] characters
      *
      * If the international brand cannot be identified, it will be an empty string.
      */
-    brand: "" | "VISA" | "MASTER" | "JCB" | "AMEX" | "DINERS",
-  }
+    brand: "" | "VISA" | "MASTER" | "JCB" | "AMEX" | "DINERS";
+  };
   export type PayType = {
     /**
      * string
@@ -19,8 +33,8 @@ export namespace FincodeNs {
      *
      * Paypay- PayPay
      */
-    pay_type: "Card" | "Konbini" | "Paypay" | "Applepay"
-  }
+    pay_type: "Card" | "Konbini" | "Paypay" | "Applepay";
+  };
 
   type JobCode = {
     /**
@@ -34,8 +48,8 @@ export namespace FincodeNs {
      *
      * CAPTURE- Confirm sales
      */
-    job_code: "AUTH" | "CAPTURE" | "CHECK"
-  }
+    job_code: "AUTH" | "CAPTURE" | "CHECK";
+  };
 
   export type AccessId = {
     /**
@@ -43,8 +57,8 @@ export namespace FincodeNs {
      *
      * Transaction ID
      */
-    access_id: string
-  }
+    access_id: string;
+  };
 
   type PaymentMethod = {
     /**
@@ -58,15 +72,15 @@ export namespace FincodeNs {
      *
      * 5- Ribo
      */
-    method?: 1 | 2 | 5
-  }
+    method?: 1 | 2 | 5;
+  };
 
   type PayTimes = {
     /**
      * Please specify the number of payments below.
      */
     pay_times: 3 | 5 | 6 | 10 | 12 | 15 | 18 | 20 | 24;
-  }
+  };
 
   type TdsType = {
     /**
@@ -76,8 +90,8 @@ export namespace FincodeNs {
      *
      * 2- Uses 3DS2.0
      */
-    tds_type: "0" | "2"
-  }
+    tds_type: "0" | "2";
+  };
 
   type Tds2Type = {
     /**
@@ -89,8 +103,8 @@ export namespace FincodeNs {
      *
      * 3- Perform authorization and payment processing without 3DS2.0 authentication.
      */
-    tds2_type: "2" | "3"
-  }
+    tds2_type: "2" | "3";
+  };
 
   export type Tds2RetUrl = {
     /**
@@ -108,7 +122,7 @@ export namespace FincodeNs {
       paramapplication/x-www-form-urlencoded
      */
     tds2_ret_url: string;
-  }
+  };
 
   type CardPayment3DS2Custom = Tds2RetUrl & {
     /**
@@ -366,151 +380,169 @@ export namespace FincodeNs {
 
   // https://docs.fincode.jp/api#tag/%E9%A1%A7%E5%AE%A2/operation/postCustomers
   export type PostCustomerRequest = {
-    id?: string | null,
-    name: string,
-    email: string,
-    phone_cc?: string,
-    phone_no?: string,
-    addr_city?: string,
-    addr_country?: string,
-    addr_line_1?: string,
-    addr_line_2?: string | null,
-    addr_line_3?: string | null,
-    addr_post_code?: string,
-    addr_state?: string
-  }
+    id?: string | null;
+    name: string;
+    email: string;
+    phone_cc?: string;
+    phone_no?: string;
+    addr_city?: string;
+    addr_country?: string;
+    addr_line_1?: string;
+    addr_line_2?: string | null;
+    addr_line_3?: string | null;
+    addr_post_code?: string;
+    addr_state?: string;
+  };
   export type CustomerInformationResponse = PostCustomerRequest & {
-    card_registration: string,
-    created: string,
-    updated: string
-  }
+    card_registration: string;
+    created: string;
+    updated: string;
+  };
   export type CustomerInfo = CustomerInformationResponse;
 
   // https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/postCustomersCustomer_idCards
   export type RegisterCardRequest = {
-    default_flag: '0' | '1';
+    default_flag: "0" | "1";
     token: string;
-  }
+  };
 
   export type RegisterCardResponse = CardInfo;
 
-  type CardPayment = PayType & AccessId & {
-    card_id?: string;
-    customer_id?: string,
-    token?: string; // card token
-  } & Partial<PaymentMethod> & Partial<PayTimes>
+  type CardPayment = PayType &
+    AccessId & {
+      card_id?: string;
+      customer_id?: string;
+      token?: string; // card token
+    } & Partial<PaymentMethod> &
+    Partial<PayTimes>;
 
-  type CardPayment3DS2 = PayType & AccessId & {
-    card_id?: string;
-    customer_id?: string,
-    token?: string; // card token
-  } & Partial<PaymentMethod> & Partial<PayTimes> & Partial<CardPayment3DS2Custom>
+  type CardPayment3DS2 = PayType &
+    AccessId & {
+      card_id?: string;
+      customer_id?: string;
+      token?: string; // card token
+    } & Partial<PaymentMethod> &
+    Partial<PayTimes> &
+    Partial<CardPayment3DS2Custom>;
 
-  export type PaymentExecution = CardPayment | CardPayment3DS2
+  export type PaymentExecution = CardPayment | CardPayment3DS2;
 
-  export type OrderDetail = JobCode & PayType & AccessId & Partial<PayTimes> & Partial<PaymentMethod> & Partial<Tds2Type> & Partial<Tds2RetUrl> & CardBrand & {
-    shop_id: string,
-    id: string,
-    /**
-     * 	string[ 1 .. 15 ] characters
-     *
-     * payment status
-     *
-     * UNPROCESSED- Unsettled
-     *
-     * CHECKED- Validity check
-     *
-     * AUTHORIZED- provisional sales
-     *
-     * CAPTURED- Confirm sales
-     *
-     * CANCELED- cancel
-     *
-     * AUTHENTICATED- Pending (3DS)
-     */
-    status: 'UNPROCESSED' | 'CHECKED' | 'AUTHORIZED' | 'CAPTURED' | 'CANCELED' | 'AUTHENTICATED',
-    /**
-     * YYYY/MM/dd HH:mm:ss.SSS
-     */
-    process_date: string,
-    item_code: string,
-    amount: number,
-    tax: number,
-    total_amount: number,
-    customer_group_id: string | null,
-    customer_id: string | null,
-    card_no: string | null,
-    card_id: string | null,
-    expire: string | null,
-    holder_name: string | null,
-    card_no_hash: string | null,
-    forward: string | null,
-    issuer: string | null,
-    transaction_id: string | null,
-    approve: string | null,
-    auth_max_date: string | null,
-    client_field_1: string | null,
-    client_field_2: string | null,
-    client_field_3: string | null,
-    /**
-     * string[ 1 .. 15 ] characters
-     *
-     * 3DS2.0 processing status
-     *
-     * 2- Return an error and do not process the payment.
-     *
-     * 3- Perform authorization and payment processing without 3DS2.0 authentication.
-     */
-    tds2_status: string | null,
-    merchant_name: string | null,
-    send_url: string | null,
-    subscription_id: string | null,
-    error_code: string | null,
-    /**
-     * YYYY/MM/dd HH:mm:ss.SSS
-     */
-    created: string,
-    /**
-     * YYYY/MM/dd HH:mm:ss.SSS
-     */
-    updated: string
-    acs_url?: string;
-  }
+  export type OrderDetail = JobCode &
+    PayType &
+    AccessId &
+    Partial<PayTimes> &
+    Partial<PaymentMethod> &
+    Partial<Tds2Type> &
+    Partial<Tds2RetUrl> &
+    CardBrand & {
+      shop_id: string;
+      id: string;
+      /**
+       * 	string[ 1 .. 15 ] characters
+       *
+       * payment status
+       *
+       * UNPROCESSED- Unsettled
+       *
+       * CHECKED- Validity check
+       *
+       * AUTHORIZED- provisional sales
+       *
+       * CAPTURED- Confirm sales
+       *
+       * CANCELED- cancel
+       *
+       * AUTHENTICATED- Pending (3DS)
+       */
+      status: "UNPROCESSED" | "CHECKED" | "AUTHORIZED" | "CAPTURED" | "CANCELED" | "AUTHENTICATED";
+      /**
+       * YYYY/MM/dd HH:mm:ss.SSS
+       */
+      process_date: string;
+      item_code: string;
+      amount: number;
+      tax: number;
+      total_amount: number;
+      customer_group_id: string | null;
+      customer_id: string | null;
+      card_no: string | null;
+      card_id: string | null;
+      expire: string | null;
+      holder_name: string | null;
+      card_no_hash: string | null;
+      forward: string | null;
+      issuer: string | null;
+      transaction_id: string | null;
+      approve: string | null;
+      auth_max_date: string | null;
+      client_field_1: string | null;
+      client_field_2: string | null;
+      client_field_3: string | null;
+      /**
+       * string[ 1 .. 15 ] characters
+       *
+       * 3DS2.0 processing status
+       *
+       * 2- Return an error and do not process the payment.
+       *
+       * 3- Perform authorization and payment processing without 3DS2.0 authentication.
+       */
+      tds2_status: string | null;
+      merchant_name: string | null;
+      send_url: string | null;
+      subscription_id: string | null;
+      error_code: string | null;
+      /**
+       * YYYY/MM/dd HH:mm:ss.SSS
+       */
+      created: string;
+      /**
+       * YYYY/MM/dd HH:mm:ss.SSS
+       */
+      updated: string;
+      acs_url?: string;
+    };
 
-  type SettlementRegistrationCommon = JobCode & PayType & Partial<Tds2Type> & Partial<TdsType> & {
-    id?: string, //Specify a unique value for each transaction. If not specified, it will be created and returned on the fincode side.
-    tax?: string,
-    client_field_1?: string,
-    client_field_2?: string,
-    client_field_3?: string,
-    /**
-     * 3D secure display store name
-     */
-    td_tenant_name?: string,
-    subscription_id?: string,
-  }
+  type SettlementRegistrationCommon = JobCode &
+    PayType &
+    Partial<Tds2Type> &
+    Partial<TdsType> & {
+      id?: string; //Specify a unique value for each transaction. If not specified, it will be created and returned on the fincode side.
+      tax?: string;
+      client_field_1?: string;
+      client_field_2?: string;
+      client_field_3?: string;
+      /**
+       * 3D secure display store name
+       */
+      td_tenant_name?: string;
+      subscription_id?: string;
+    };
   /**
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/operation/postPayments
    */
-  export type SettlementRegistration = (SettlementRegistrationCommon & {
-    job_code: "AUTH" | "CAPTURE",
-    amount: number, // range from 1 to 9,999,999. Please specify the total including tax and shipping in 7 digits. * job_code='CHECK'Required except for
-  }) | (SettlementRegistrationCommon & { job_code: "CHECK", amount: undefined })
+  export type SettlementRegistration =
+    | (SettlementRegistrationCommon & {
+        job_code: "AUTH" | "CAPTURE";
+        amount: number; // range from 1 to 9,999,999. Please specify the total including tax and shipping in 7 digits. * job_code='CHECK'Required except for
+      })
+    | (SettlementRegistrationCommon & { job_code: "CHECK"; amount: undefined });
 
   /**
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/operation/getPaymentsId
    */
-  export type ConfirmSales = PayType & AccessId & Partial<PayTimes> & Partial<PaymentMethod>
+  export type ConfirmSales = PayType & AccessId & Partial<PayTimes> & Partial<PaymentMethod>;
 
   /**
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/operation/putPaymentsIdSecure
    */
-  export type PaymentAfterAuthentication = PayType & AccessId & {
-    /**
-     * Required only when using 3DS1.0. 3DS service result message encrypted by the card company
-     */
-    pa_res?: string;
-  }
+  export type PaymentAfterAuthentication = PayType &
+    AccessId & {
+      /**
+       * Required only when using 3DS1.0. 3DS service result message encrypted by the card company
+       */
+      pa_res?: string;
+    };
 
   /**
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/paths/~1secure2~1%7Baccess_id%7D/put
@@ -524,7 +556,7 @@ export namespace FincodeNs {
      * After executing payment, access `acs_url` and set the `param` returned for `tds2_ret_url` to this parameter.
      */
     param: string;
-  }
+  };
 
   /**
    * ref: https://docs.fincode.jp/api#tag/%E6%B1%BA%E6%B8%88/paths/~1secure2~1%7Baccess_id%7D/put
@@ -557,11 +589,11 @@ export namespace FincodeNs {
      *
      * Authentication result reason
      */
-    tds2_trans_result_reason: string
-  }
+    tds2_trans_result_reason: string;
+  };
   export type Result3DS2Authentication = Partial<Result3DS2> & {
     challenge_url: string;
-  }
+  };
 
   export type MerchantReturnURLData = {
     /**
@@ -587,10 +619,44 @@ export namespace FincodeNs {
      *
      * 3DS2.0 authentication parameters. Use in `Run 3DS2.0 authentication`
      */
-    param: string
-  }
+    param: string;
+  };
 
-  export type CustomersResponse = {
+  /**
+   * https://docs.fincode.jp/api#tag/%E3%83%9A%E3%83%BC%E3%82%B8%E3%83%8D%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3
+   */
+  export type PaginationListRequest = {
+    /**
+     * default: 10
+     *
+     * range: 10-100
+     */
+    limit?: number;
+    /**
+     * default: 1
+     *
+     * range: 1-9999
+     */
+    page?: number;
+    /**
+     * default: false
+     */
+    count_only?: boolean;
+    /**
+     * If the total count only flag is true, this request will be ignored.
+     *
+     * sort=Item name 1 [asc | desc], Item name 2 [asc | desc], …
+     *
+     * Example: sort=customer_id asc, customer_name asc, customer_email desc
+     *
+     * If the total count only flag is true, this request will be ignored.
+     *
+     * If the specified item is missing or the format is invalid, an error will occur. If not specified, the default sort order for each API will be used.
+     */
+    sort?: string;
+  };
+
+  export type PaginationListResponse<T> = {
     /**
      * integer
      *
@@ -609,7 +675,7 @@ export namespace FincodeNs {
      *
      * current page
      */
-    current_page: number
+    current_page: number;
 
     /**
      * integer
@@ -623,21 +689,23 @@ export namespace FincodeNs {
      *
      * Link to next page
      */
-    link_next: string;
+    link_next: string | null;
 
     /**
      * string
      *
      * Link to previous page
      */
-    link_previous: string;
+    link_previous: string | null;
     /**
      * Array of objects
      *
-     * Customer data list
+     * data list
      */
-    list: CustomerInfo[]
-  }
+    list: T[];
+  };
+
+  export type CustomersResponse = PaginationListResponse<CustomerInfo>;
 
   /**
    * https://docs.fincode.jp/api#tag/%E3%82%AB%E3%83%BC%E3%83%89/operation/deleteCustomersCustomer_idCardsId
@@ -665,5 +733,236 @@ export namespace FincodeNs {
      * 必須項目
      */
     delete_flag: "1";
+  };
+
+  export namespace PlatformSale {
+    export type PlatformSaleItem = {
+      /**
+       * string [ 1 .. 20 ] characters
+       *
+       * Actuarial ID
+       */
+      account_id: string;
+      /**
+       * string[ 1 .. 20 ] characters
+       *
+       * Sales payment ID, `sales_s...`
+       */
+      id: string;
+      /**
+       * string[ 1 .. 20 ] characters
+       *
+       * Sales payment ID
+       */
+      shop_id: string;
+      /**
+       * Estimated deposit date YYYY/MM/dd HH:mm Format
+       */
+      scheduled_deposit_date: string;
+      /**
+       * Aggregation period (start) YYYY/MM/dd HH:mm Format
+       */
+      aggregate_term_start: string;
+      /**
+       * Aggregation period (end) YYYY/MM/dd HH:mm Format
+       */
+      aggregate_term_end: string;
+      /**
+       * Receipt date YYYY/MM/dd HH:mm Format
+       */
+      deposit_date: string | null;
+      /**
+       * Payment deadline YYYY/MM/dd HH:mm Format
+       */
+      payment_deadline: string | null;
+      /**
+       * Billing completion date YYYY/MM/dd HH:mm Format
+       */
+      payment_completion_date: string | null;
+      /**
+       * Deposit status
+       *
+       * 3001- Amount not confirmed
+       *
+       * 3002- Amount confirmed
+       *
+       * 3003- Deposit Completed
+       *
+       * 3004- Deposit stopped
+       *
+       * 3005- Deposit error
+       *
+       * 3006- Billing
+       *
+       * 3007- Billing error
+       *
+       * 3008- Billing suspended
+       *
+       * 3009- Paid
+       *
+       * 3010- The person Confirmation documents not completed
+       *
+       * 3011- Payment completed
+       *
+       * 3012- Before deposit starts
+       *
+       * 3013- Contract not established
+       */
+      status_code: 3001 | 3002 | 3003 | 3004 | 3005 | 3006 | 3007 | 3008 | 3009 | 3010 | 3011 | 3012 | 3013;
+      /**
+       * number
+       */
+      count: number;
+      /**
+       * Actuarial amount
+       */
+      settlement_amount: number;
+      /**
+       * Transfer fee
+       */
+      bank_transfer_fee: number;
+      /**
+       * total amount
+       */
+      total_amount: number;
+      /**
+       * commission
+       */
+      fee_amount: number;
+      /**
+       * Platform usage fee (excluding tax)
+       */
+      platform_fee_amout: number;
+      /**
+       * Platform usage fee consumption tax
+       */
+      platform_fee_tax_amout: number;
+      /**
+       * sale tax
+       */
+      tax_amount: number;
+      /**
+       * Deposit amount
+       */
+      deposit_amount: number;
+      /**
+       * Validation confirmation flag
+       */
+      verified: boolean;
+      /**
+       * Creation date and time YYYY/MM/dd HH:mm:ss.SSS.SSS Format
+       */
+      created: string;
+      /**
+       * Updated date/time YYYY/MM/dd HH:mm:ss.SSS.SSSFormat
+       */
+      updated: string;
+    };
+
+    export type PlatformSaleListRequest = PaginationListRequest & {
+      /**
+       * Determine the month
+       */
+      processed?: string;
+      /**
+       * @type PlatformSaleItem["status_code"]
+       */
+      status?: PlatformSaleItem["status_code"];
+      /**
+       * Estimated deposit date. YYYY/MM/dd Format
+       */
+      scheduled?: string;
+      /**
+       * Opening price of the range specified for the scheduled deposit date. YYYY/MM/dd Format
+       */
+      scheduled_from?: string;
+      /**
+       * The closing price of the range specified for the scheduled deposit date. YYYY/MM/dd Format
+       */
+      scheduled_to?: string;
+    };
+
+    /**
+     * https://docs.fincode.jp/api#tag/%E3%83%97%E3%83%A9%E3%83%83%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%E5%A3%B2%E4%B8%8A/operation/getPlatform_accounts
+     */
+    export type ObtainsPlatformSalesList = PaginationListResponse<PlatformSaleItem>;
+
+    /**
+     * https://docs.fincode.jp/api#tag/%E3%83%97%E3%83%A9%E3%83%83%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%E5%A3%B2%E4%B8%8A/operation/getPlatform_accountsId
+     */
+    export type PlatformSaleDetail = PlatformSaleItem & {
+      /**
+       * Financial institution name
+       */
+      bank_name: string;
+      /**
+       * Financial institution name kana
+       */
+      bank_name_kana: string;
+      /**
+       * Bank Code
+       */
+      bank_code: string;
+      /**
+       * Branch name
+       */
+      branch_name: string;
+      /**
+       * Branch name kana
+       */
+      branch_name_kana: string;
+      /**
+       * Branch code
+       */
+      bracnch_code: string;
+      /**
+       * Account type
+       *
+       * 0- normal
+       *
+       * 1- Immediate
+       */
+      account_kind: 0 | 1;
+      /**
+       * account number
+       */
+      account_number: string;
+      /**
+       * Account holder
+       */
+      account_name: string;
+    };
+
+    export type PlatformSaleSummaryItem = Pick<
+      PlatformSaleItem,
+      | "account_id"
+      | "shop_id"
+      | "scheduled_deposit_date"
+      | "aggregate_term_start"
+      | "aggregate_term_end"
+      | "deposit_date"
+      | "count"
+      | "settlement_amount"
+      | "bank_transfer_fee"
+      | "total_amount"
+      | "fee_amount"
+      | "platform_fee_amout"
+      | "platform_fee_tax_amout"
+      | "tax_amount"
+      | "deposit_amount"
+      | "verified"
+      | "created"
+      | "updated"
+    > & {
+      /**
+       * Platform fee sales summary ID
+       */
+      summary_id: string;
+    };
+
+    /**
+     * https://docs.fincode.jp/api#tag/%E3%83%97%E3%83%A9%E3%83%83%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%E5%A3%B2%E4%B8%8A/operation/getPlatform_accountsIdSummary
+     */
+    export type PlatformSaleSummaryList = PaginationListResponse<PlatformSaleSummaryItem>;
   }
 }
