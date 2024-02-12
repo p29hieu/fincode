@@ -558,7 +558,7 @@ export class FincodeService {
       onSuccess?: FincodeNs.Callback.Success<FincodeNs.Tenant.TenantDetail>;
       onError?: FincodeNs.Callback.Error;
     },
-  ): Promise<FincodeNs.Sale.SaleDetailResponse> {
+  ): Promise<FincodeNs.Tenant.TenantDetail> {
     try {
       const endpoint = "/v1/tenants/{id}".replace("{id}", ID);
       const { data } = await this.service.get(endpoint);
