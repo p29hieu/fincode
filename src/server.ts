@@ -549,4 +549,27 @@ export class FincodeService {
       }
     }
   }
+  /**
+   * [Specify the shop ID to obtain shop information about one tenant belonging to your platform.](https://docs.fincode.jp/api#tag/%E3%83%86%E3%83%8A%E3%83%B3%E3%83%88/operation/getTenantsId)
+   */
+  async getTenantsId(
+    ID: string,
+    options?: {
+      onSuccess?: FincodeNs.Callback.Success<FincodeNs.Tenant.TenantDetail>;
+      onError?: FincodeNs.Callback.Error;
+    },
+  ): Promise<FincodeNs.Sale.SaleDetailResponse> {
+    try {
+      const endpoint = "/v1/tenants/{id}".replace("{id}", ID);
+      const { data } = await this.service.get(endpoint);
+      if (options?.onSuccess) {
+        await options.onSuccess(data);
+      }
+      return data;
+    } catch (error) {
+      if (options?.onError) {
+        await options.onError(error.response?.data);
+      }
+    }
+  }
 }

@@ -957,4 +957,92 @@ export namespace FincodeNs {
       };
     export type SaleDetailResponse = PaginationListResponse<SaleDetailItem>;
   }
+
+  export namespace Tenant {
+    export type ShopType = "null" | "platform" | "tenant";
+    export type PlatformRateList = {
+      /**
+       * Payment provider type ID
+       *
+       * vm- Card payment (UC or TFC(VISA))
+       *
+       * jad- Card payment (JCB/AMEX/DINERS)
+       *
+       * applepay_vm- Apple Pay（UC）
+       *
+       * applepay_jad- Apple Pay（JCB/AMEX）
+       *
+       * konbini- Convenience store settlement
+       *
+       * paypay- PayPay
+       *
+       * directdebit- Account transfer
+       */
+      id: "vm" | "jad" | "applepay_vm" | "applepay_jad" | "konbini" | "paypay" | "directdebit";
+      /**
+       * double
+       *
+       * Platform usage fee rate
+       */
+      platform_rate: number;
+      /**
+       * integer
+       *
+       * Platform usage fee Minimum usage fee
+       */
+      fixed_fee: number;
+      /**
+       * double
+       *
+       * Platform usage fee Web registration usage fee
+       */
+      web_registration_fee: number;
+    };
+    export type TenantDetail = {
+      /**
+       * Shop ID
+       */
+      id: string;
+      shop_password: string;
+      shop_name: string;
+      shop_name_kana: string;
+      customer_group_id: string;
+      /**
+       * Notification email address
+       */
+      send_mail_address: string;
+      /**
+       * Member store email address
+       */
+      shop_mail_address: string;
+      log_keep_days: string;
+      api_version: string;
+      shop_type: ShopType;
+      platform_id: string;
+      platform_name: string;
+      /**
+       * "0" - don't share
+       *
+       * "1" - share
+       */
+      shared_customer_flag: "0" | "1";
+      platform_rate_list: PlatformRateList[];
+      /**
+       * API key display flag.
+       *
+       * "0" - indicate
+       *
+       * "1" - do not show
+       */
+      api_key_display_flag: "0" | "1";
+      /**
+       * YYYY/MM/dd HH:mm:ss.SSS format
+       */
+      created: string;
+      /**
+       * YYYY/MM/dd HH:mm:ss.SSS format
+       */
+      updated: string;
+    };
+  }
 }
