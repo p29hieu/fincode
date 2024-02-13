@@ -225,10 +225,10 @@ export class FincodeService {
   async getCustomersCustomerIdCards(
     customerId: string,
     options?: {
-      onSuccess?: FincodeNs.Callback.Success<FincodeNs.CardInfo[]>;
+      onSuccess?: FincodeNs.Callback.Success<{ list: FincodeNs.CardInfo[] }>;
       onError?: FincodeNs.Callback.Error;
     },
-  ): Promise<FincodeNs.CardInfo[]> {
+  ): Promise<{ list: FincodeNs.CardInfo[] }> {
     if (!this._config.publicKey) {
       throw new Error("publicKey is required");
     }

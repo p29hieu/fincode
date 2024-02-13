@@ -96,7 +96,7 @@ export class FincodeClientService {
   async getCustomersCustomerIdCards(
     customerId: string,
     options?: {
-      onSuccess?: FincodeNs.Callback.Success<FincodeNs.CardInfo[]>;
+      onSuccess?: FincodeNs.Callback.Success<{ list: FincodeNs.CardInfo[] }>;
       onError?: FincodeNs.Callback.Error;
     },
   ): Promise<{ list: FincodeNs.CardInfo[] }> {
