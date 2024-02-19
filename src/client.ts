@@ -4,6 +4,22 @@ type FincodeClientConfig = {
   baseUrl: string;
   dashBoardUrl: string;
   publicKey: string;
+  /**
+   * Unique value (UUIDv4)
+   *
+   * Please specify a unique value for each request in a format that follows the idempotent key UUIDv4.
+   *
+   * For more information, see [idempotent processing](https://docs.fincode.jp/api#tag/%E5%86%AA%E7%AD%89%E5%87%A6%E7%90%86) .
+   */
+  idempotent_key?: string;
+  /**
+   * *For platforms
+   *
+   * Used when the platform executes the API as a tenant.
+   *
+   * Please specify the shop ID of the tenant belonging to the operating platform.
+   */
+  tenantShopId?: string;
 };
 export class FincodeClientService {
   static _instance: FincodeClientService;
@@ -61,6 +77,8 @@ export class FincodeClientService {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this._config.publicKey}`,
+        ...(this._config.tenantShopId ? { "Tenant-Shop-Id": this._config.tenantShopId } : {}),
+        ...(this._config.idempotent_key ? { "idempotent_key": this._config.idempotent_key } : {}),
       },
     });
   }
