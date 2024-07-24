@@ -1,8 +1,10 @@
 import axios, { AxiosInstance } from "axios";
 import { FincodeNs } from "./types";
-type FincodeClientConfig = {
-  baseUrl: string;
-  dashBoardUrl: string;
+import { CardObject, CustomerObject, Executing3DSecureAuthResponse, PaymentObject, ExecutingPaymentRequest } from "@fincode/js";
+import { assert } from "console";
+
+type Config = {
+  isLiveMode?: boolean;
   publicKey: string;
   /**
    * Unique value (UUIDv4)
@@ -11,7 +13,7 @@ type FincodeClientConfig = {
    *
    * For more information, see [idempotent processing](https://docs.fincode.jp/api#tag/%E5%86%AA%E7%AD%89%E5%87%A6%E7%90%86) .
    */
-  idempotent_key?: string;
+  idempotentKey?: string;
   /**
    * *For platforms
    *
@@ -22,63 +24,34 @@ type FincodeClientConfig = {
   tenantShopId?: string;
 };
 export class FincodeClientService {
-  static _instance: FincodeClientService;
-
-  static getConfig(config?: Partial<FincodeClientConfig>): FincodeClientConfig {
-    config ??= {};
-    config.publicKey = config.publicKey || process.env.FINCODE_PK;
-    if (!config.publicKey) {
-      throw new Error("config.publicKey or env FINCODE_PK is required");
-    }
-    if (!config.baseUrl) {
-      if (process.env.NODE_ENV === "production") {
-        config.baseUrl = "https://api.fincode.jp";
-      } else {
-        config.baseUrl = "https://api.test.fincode.jp";
-      }
-    }
-    if (!config.dashBoardUrl) {
-      if (process.env.NODE_ENV === "production") {
-        config.dashBoardUrl = "https://dashboard.test.fincode.jp";
-      } else {
-        config.dashBoardUrl = "https://dashboard.fincode.jp";
-      }
-    }
-    return config as FincodeClientConfig;
-  }
-
-  /**
-   * get FincodeClientService singleton
-   */
-  static get i() {
-    if (!this._instance) {
-      this._instance = new FincodeClientService();
-    }
-    return this._instance;
-  }
-
-  static createInstance(config?: Partial<FincodeClientConfig>) {
-    const instance = new FincodeClientService();
-    instance.config(config);
-    return instance;
-  }
-
-  private _config: FincodeClientConfig;
   private service: AxiosInstance;
+  private baseUrl: string;
+  private dashBoardUrl: string;
+  private publicKey: string;
+  private tenantShopId?: string;
+  private idempotentKey?: string;
+  private isLiveMode: boolean;
 
-  get configData() {
-    return this._config;
-  }
-
-  config(config?: Partial<FincodeClientConfig>) {
-    this._config = FincodeClientService.getConfig(config);
+  constructor(config: Config) {
+    assert(this.publicKey, "publicKey must be required");
+    this.isLiveMode = config.isLiveMode || false;
+    this.publicKey = config.publicKey;
+    this.idempotentKey = config.idempotentKey;
+    this.tenantShopId = config.tenantShopId;
+    if (this.isLiveMode) {
+      this.dashBoardUrl = "https://dashboard.fincode.jp";
+      this.baseUrl = "https://api.fincode.jp";
+    } else {
+      this.dashBoardUrl = "https://dashboard.test.fincode.jp";
+      this.baseUrl = "https://api.test.fincode.jp";
+    }
     this.service = axios.create({
-      baseURL: this._config.baseUrl,
+      baseURL: this.baseUrl,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${this._config.publicKey}`,
-        ...(this._config.tenantShopId ? { "Tenant-Shop-Id": this._config.tenantShopId } : {}),
-        ...(this._config.idempotent_key ? { "idempotent_key": this._config.idempotent_key } : {}),
+        Authorization: `Bearer ${this.publicKey}`,
+        ...(this.tenantShopId ? { "Tenant-Shop-Id": this.tenantShopId } : {}),
+        ...(this.idempotentKey ? { idempotent_key: this.idempotentKey } : {}),
       },
     });
   }
@@ -90,10 +63,10 @@ export class FincodeClientService {
   async getCustomersId(
     customerId: string,
     options?: {
-      onSuccess?: FincodeNs.Callback.Success<FincodeNs.CustomerInfo>;
+      onSuccess?: FincodeNs.Callback.Success<CustomerObject>;
       onError?: FincodeNs.Callback.Error;
     },
-  ): Promise<FincodeNs.CustomerInfo> {
+  ): Promise<CustomerObject> {
     try {
       const res = await this.service.get("/v1/customers/{id}".replace("{id}", customerId));
       if (options?.onSuccess) {
@@ -114,10 +87,10 @@ export class FincodeClientService {
   async getCustomersCustomerIdCards(
     customerId: string,
     options?: {
-      onSuccess?: FincodeNs.Callback.Success<{ list: FincodeNs.CardInfo[] }>;
+      onSuccess?: FincodeNs.Callback.Success<FincodeNs.ListResponse<CardObject>>;
       onError?: FincodeNs.Callback.Error;
     },
-  ): Promise<{ list: FincodeNs.CardInfo[] }> {
+  ): Promise<FincodeNs.ListResponse<CardObject>> {
     try {
       const endpoint = "/v1/customers/{customer_id}/cards".replace("{customer_id}", customerId);
       const res = await this.service.get(endpoint);
@@ -137,12 +110,12 @@ export class FincodeClientService {
    */
   async paymentExecution(
     orderId: string,
-    data: FincodeNs.PaymentExecution,
+    data: ExecutingPaymentRequest,
     options?: {
-      onSuccess?: FincodeNs.Callback.Success<FincodeNs.OrderDetail>;
+      onSuccess?: FincodeNs.Callback.Success<PaymentObject>;
       onError?: FincodeNs.Callback.Error;
     },
-  ): Promise<FincodeNs.OrderDetail> {
+  ): Promise<PaymentObject> {
     try {
       const endpoint = "/v1/payments/{id}".replace("{id}", orderId);
       const res = await this.service.put(endpoint, {
@@ -170,10 +143,10 @@ export class FincodeClientService {
   async acquire3DS2Result(
     access_id: string,
     options?: {
-      onSuccess?: FincodeNs.Callback.Success<FincodeNs.OrderDetail>;
+      onSuccess?: FincodeNs.Callback.Success<PaymentObject>;
       onError?: FincodeNs.Callback.Error;
     },
-  ): Promise<FincodeNs.Result3DS2> {
+  ): Promise<Executing3DSecureAuthResponse> {
     try {
       const endpoint = "/v1/secure2/{access_id}".replace("{access_id}", access_id);
       const res = await this.service.get(`${endpoint}`);
