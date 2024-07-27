@@ -1,9 +1,7 @@
 import { config } from 'dotenv'
 config()
 
-import axios from 'axios'
-import { FincodeClientService } from "fincode";
-import { createFincode, FincodeConfig, Payment } from "@fincode/node";
+import { createFincode, FincodeConfig } from "@fincode/node";
 
 const fincodeIsLiveMode = process.env.FINCODE_IS_LIVEMODE === 'true';
 const apiKey = process.env.FINCODE_SK || '';
@@ -12,37 +10,35 @@ const fincodeConfig: FincodeConfig = {
   isLiveMode: fincodeIsLiveMode,
   options: {}
 }
-const fincodeApiUrl = fincodeIsLiveMode ? 'https://api.fincode.jp/v1' : 'https://api.test.fincode.jp/v1'
 
-const axiosInstance = axios.create({
-  baseURL: fincodeApiUrl,
-  headers: {
-    Authorization: `Bearer ${apiKey}`,
-    "Content-Type": "application/json"
-  }
-})
+const fincode = createFincode(fincodeConfig);
 const purchaseWithBank = async () => {
-  const fincode = createFincode(fincodeConfig);
   const orderId = `o_test_${Date.now()}`
   const order = await fincode.payments.create({
     id: orderId,
     pay_type: "Virtualaccount",
-    billing_amount: "10000",
+    billing_amount: "10",
   } as any)
 
   console.log("===order", order)
 
   const orderExecuted = await fincode.payments.execute(orderId, {
     access_id: order.access_id,
-    payment_term_day: "0",
+    payment_term_day: "7",
     pay_type: "Virtualaccount",
   } as any)
   console.log("===orderExecuted", orderExecuted)
+
 }
 
 const main = async () => {
   try {
     await purchaseWithBank()
+
+  // const paymentDetail = await fincode.payments.retrieve('o_test_1721982416236', {
+  //   pay_type:"Virtualaccount"
+  // } as any);
+  // console.log("===paymentDetail",paymentDetail)
   } catch (error: any) {
     console.error(error)
   }

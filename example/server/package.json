@@ -11,7 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "@fincode/node": "^1.0.2",
-    "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "fincode": "../../",
     "ts-node": "^10.9.2"
