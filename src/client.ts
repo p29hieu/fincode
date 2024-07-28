@@ -33,7 +33,7 @@ export class FincodeClientService {
   private isLiveMode: boolean;
 
   constructor(config: Config) {
-    if (!this.publicKey) {
+    if (!config.publicKey) {
       throw new Error("publicKey must be required");
     }
     this.isLiveMode = config.isLiveMode || false;
