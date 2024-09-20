@@ -9,6 +9,7 @@
   "author": "p29hieu",
   "license": "ISC",
   "dependencies": {
+    "@fincode/node": "^1.0.2",
     "dotenv": "^16.0.3",
     "fincode": "../../"
   },

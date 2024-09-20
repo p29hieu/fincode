@@ -3,7 +3,8 @@
 ## Prepare
 
 - get Fincode secret key and public key at [Fincode config](https://dashboard.test.fincode.jp/development/config)
-- update `FINCODE_SK`, `NEXT_PUBLIC_FINCODE_PK` in `.env.development`
+- create `.env` file: `cp .env.example .env`
+- update `FINCODE_SK`, `NEXT_PUBLIC_FINCODE_PK` in `.env`
 
 ## Required
 

@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fincode/node": "^1.0.2",
     "fincode": "../../../",
     "next": "13.4.3",
     "node-fetch": "^3.3.2",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "uid": "^2.0.2"
   },
   "devDependencies": {
     "@types/node": "20.2.3",

@@ -9,11 +9,10 @@ const ValidatePaymentPage = () => {
   useEffect(() => {
     const { url } = router.query;
     if (url) {
-      setRedirectUrl(`${url}`);
-      router.replace(`${url}`)
-      // setTimeout(() => {
-      //   window.open(`${url}`, "_blank");
-      // }, 300);
+      setTimeout(() => {
+        setRedirectUrl(`${url}`);
+        router.replace(`${url}`);
+      }, 300);
     }
   }, [router]);
 

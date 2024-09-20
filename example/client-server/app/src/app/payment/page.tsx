@@ -1,6 +1,4 @@
 "use client";
-import { fincodeClient } from "@/utils";
-import { FincodeNs } from "fincode";
 import Head from "next/head";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -9,12 +7,13 @@ type PurchaseDataResponse = {
   access_id: string;
   id: string;
 };
+type CardInfo = any;
 const PaymentPage = () => {
   const [amount, setAmount] = useState<number>(1000);
   const [purchaseData, setPurchaseData] = useState<PurchaseDataResponse>();
   const [customerId, setCustomerId] = useState<string>();
-  const [cards, setCards] = useState<FincodeNs.CardInfo[]>([]);
-  const [cardSelected, setCardSelected] = useState<FincodeNs.CardInfo>();
+  const [cards, setCards] = useState<CardInfo[]>([]);
+  const [cardSelected, setCardSelected] = useState<CardInfo>();
 
   const handleCreateOrder = useCallback(async () => {
     const response = await fetch(`/api/order?amount=${amount}`, {
@@ -43,14 +42,14 @@ const PaymentPage = () => {
 
   const fetchCardList = useCallback(async () => {
     if (customerId) {
-      const cardList = await fincodeClient.getCustomersCustomerIdCards(
-        customerId
-      );
-      const cardSelected = cardList.list.findLast(
-        (card) => card.default_flag === "1"
-      );
-      cardSelected && setCardSelected(cardSelected);
-      setCards(cardList.list);
+      // const cardList = await fincodeClient.getCustomersCustomerIdCards(
+      //   customerId
+      // );
+      // const cardSelected = cardList.list.findLast(
+      //   (card: CardInfo) => card.default_flag === "1"
+      // );
+      // cardSelected && setCardSelected(cardSelected);
+      // setCards(cardList.list);
     }
   }, [customerId]);
 
@@ -180,6 +179,8 @@ const PaymentPage = () => {
       </div>
 
       <Link href="/payment/card">Payment with card</Link>
+      <br />
+      <Link href="/payment/paypay">Payment with PayPay</Link>
     </div>
   );
 };
