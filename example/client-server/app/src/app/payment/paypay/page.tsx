@@ -1,8 +1,7 @@
 "use client";
 
 import { PurchaseWithPayPay } from "@/app/api/purchase/paypay/route";
-import { PurchaseDto } from "@/app/api/purchase/route";
-import { useEffect, useState } from "react";
+import  React, { useState } from "react";
 
 const PaymentWithPayPay = () => {
   const [amount, setAmount] = useState<number>();

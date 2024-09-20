@@ -1,7 +1,7 @@
 "use client";
 import Head from "next/head";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 type PurchaseDataResponse = {
   access_id: string;
